@@ -100,6 +100,7 @@ namespace ns3 {
 		int res = -1024;
 		uint32_t fcount = m_qpGrp->GetN();
 		uint32_t min_finish_id = 0xffffffff;
+		m_rrlast = 0;//每次先选择最高的
 		for (qIndex = 1; qIndex <= fcount; qIndex++){
 			uint32_t idx = (qIndex + m_rrlast) % fcount;
 			Ptr<RdmaQueuePair> qp = m_qpGrp->Get(idx);

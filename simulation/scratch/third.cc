@@ -134,6 +134,12 @@ void ReadFlowInput(){
 }
 void ScheduleFlowInputs(){
 	while (flow_input.idx < flow_num && Seconds(flow_input.start_time) == Simulator::Now()){
+
+		Ptr<RdmaHw> m_rdma = n.Get(flow_input.src)->GetObject<RdmaDriver>()->m_rdma;
+		m_rdma->m_nextnode = n.Get(flow_input.dst);
+		m_rdma->dport = flow_input.dport;
+		m_rdma->maxPacketCount = flow_input.maxPacketCount;
+
 		uint32_t port = portNumder[flow_input.src][flow_input.dst]++; // get a new port number 
 		RdmaClientHelper clientHelper(flow_input.pg, serverAddress[flow_input.src], serverAddress[flow_input.dst], port, flow_input.dport, flow_input.maxPacketCount, has_win?(global_t==1?maxBdp:pairBdp[n.Get(flow_input.src)][n.Get(flow_input.dst)]):0, global_t==1?maxRtt:pairRtt[flow_input.src][flow_input.dst]);
 		ApplicationContainer appCon = clientHelper.Install(n.Get(flow_input.src));
@@ -150,6 +156,15 @@ void ScheduleFlowInputs(){
 	}else { // no more flows, close the file
 		flowf.close();
 	}
+}
+
+void create_new_app_after_compute(Ptr<Node> m_node,Ptr<Node> m_nextnode){//表示计算后创建新app、qp
+	Ptr<RdmaHw> m_rdma = m_node->GetObject<RdmaDriver>()->m_rdma;
+	Ptr<RdmaHw> m_nextrdma = m_nextnode->GetObject<RdmaDriver>()->m_rdma;
+	uint32_t port = portNumder[m_node->GetId()][m_nextnode->GetId()]++; // get a new port number
+	RdmaClientHelper clientHelper( 3 , serverAddress[m_node->GetId()], serverAddress[m_nextnode->GetId()], port, m_rdma->dport, m_rdma->maxPacketCount, has_win?(global_t==1?maxBdp:pairBdp[n.Get(m_node->GetId())][n.Get(m_nextnode->GetId())]):0, global_t==1?maxRtt:pairRtt[m_node->GetId()][m_nextnode->GetId()]);
+	ApplicationContainer appCon = clientHelper.Install(n.Get(m_node->GetId()));
+	appCon.Start(Time(0));
 }
 
 Ipv4Address node_id_to_ip(uint32_t id){
@@ -881,15 +896,27 @@ int main(int argc, char *argv[])
 			rdmaHw->SetAttribute("RateBound", BooleanValue(rate_bound));
 			rdmaHw->SetAttribute("DctcpRateAI", DataRateValue(DataRate(dctcp_rate_ai)));
 			rdmaHw->SetPintSmplThresh(pint_prob);
+			rdmaHw->total_node_number = node_num - switch_num;//test
+			rdmaHw->round_count =  node_num - switch_num;
+			rdmaHw->m_create_new_app_after_compute = MakeCallback(&create_new_app_after_compute);
+
+
+
 			// create and install RdmaDriver
 			Ptr<RdmaDriver> rdma = CreateObject<RdmaDriver>();
 			Ptr<Node> node = n.Get(i);
+
+			// node->rdmaHw = rdmaHw;
+
 			rdma->SetNode(node);
 			rdma->SetRdmaHw(rdmaHw);
 
 			node->AggregateObject (rdma);
 			rdma->Init();
 			rdma->TraceConnectWithoutContext("QpComplete", MakeBoundCallback (qp_finish, fct_output));
+
+
+			//  std::cout<<rdmaHw->total_node_number<<std::endl;
 		}
 	}
 	#endif

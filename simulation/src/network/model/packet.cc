@@ -138,6 +138,7 @@ Packet::Packet ()
     m_metadata (static_cast<uint64_t> (Simulator::GetSystemId ()) << 32 | m_globalUid, 0),
     m_nixVector (0)
 {
+  
   m_globalUid++;
 }
 
@@ -180,6 +181,8 @@ Packet::Packet (uint32_t size)
     m_metadata (static_cast<uint64_t> (Simulator::GetSystemId ()) << 32 | m_globalUid, size),
     m_nixVector (0)
 {
+  iflast = 0;
+  ifLast = false;
   m_globalUid++;
 }
 Packet::Packet (uint8_t const *buffer, uint32_t size, bool magic)
@@ -884,6 +887,23 @@ Packet::PrintPacketTags (std::ostream &os) const
         }
     }
 }
+
+// bool Packet::setiflast( uint8_t flag ){
+//   iflast = flag;
+//   return true;
+// }
+// uint8_t Packet::getiflast(void) const{
+//   return iflast;
+// }
+
+bool Packet::setifLast( bool flag ){
+  ifLast = flag;
+  return ifLast;
+}
+bool Packet::getifLast(void) const{
+  return ifLast;
+}
+
 
 PacketTagIterator 
 Packet::GetPacketTagIterator (void) const

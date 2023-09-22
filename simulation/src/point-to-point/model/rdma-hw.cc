@@ -310,6 +310,11 @@ int RdmaHw::ReceiveUdp(Ptr<Packet> p, CustomHeader &ch){
 	rxQp->m_ecn_source.total++;
 	rxQp->m_milestone_rx = m_ack_interval;
 
+	if(m_node->GetId()==3){
+		std::cout<<"node."<<m_node->GetId()<<" "<<"at time"<<Simulator::Now()<<" "<<p->getifLast() <<std::endl;
+	}
+
+
 	int x = ReceiverCheckSeq(ch.udp.seq, rxQp, payload_size);
 	if (x == 1 || x == 2){ //generate ACK or NACK
 		qbbHeader seqh;
@@ -338,6 +343,14 @@ int RdmaHw::ReceiveUdp(Ptr<Packet> p, CustomHeader &ch){
 		uint32_t nic_idx = GetNicIdxOfRxQp(rxQp);
 		m_nic[nic_idx].dev->RdmaEnqueueHighPrioQ(newp);
 		m_nic[nic_idx].dev->TriggerTransmit();
+	}
+	if(x == 1 && p->getifLast() == true && round_count > 1){
+		//ifLast 此处进行表示计算,并新建qp/application发送
+		Simulator::Schedule(Seconds(0.5) , &RdmaHw::m_create_new_app_after_compute ,this, m_node , m_nextnode);
+		
+		std::cout<<m_node->GetId()<<" ";
+		std::cout<<"creat new qp"<<" "<<"no."<<total_node_number - round_count + 1<<" "<<"at time"<<Simulator::Now()<<std::endl;
+		round_count--;
 	}
 	return 0;
 }
@@ -547,9 +560,22 @@ void RdmaHw::RedistributeQp(){
 
 Ptr<Packet> RdmaHw::GetNxtPacket(Ptr<RdmaQueuePair> qp){
 	uint32_t payload_size = qp->GetBytesLeft();
+	uint32_t bytesLeft = payload_size;
 	if (m_mtu < payload_size)
 		payload_size = m_mtu;
 	Ptr<Packet> p = Create<Packet> (payload_size);
+	// if(bytesLeft <= m_mtu){
+	// 	p->setiflast(1);
+	// }else{
+	// 	p->setiflast(0);
+	// }
+
+	if(bytesLeft <= m_mtu){
+		p->setifLast(true);
+	}else{
+		p->setifLast(false);
+	}
+
 	// add SeqTsHeader
 	SeqTsHeader seqTs;
 	seqTs.SetSeq (qp->snd_nxt);
