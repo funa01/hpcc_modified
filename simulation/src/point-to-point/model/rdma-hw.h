@@ -29,7 +29,10 @@ public:
 
 	uint32_t total_node_number;
 	uint32_t round_count;
+	Time compute_start_time;//计算的开始时间
 	double compute_time;	//计算的时间
+	bool GPU_available;
+	uint32_t GPU_waiting_count; //gpu等待计算的数据包数量(包含正在计算的)
 	uint32_t dport,maxPacketCount;
 	
 
@@ -56,6 +59,9 @@ public:
 	//creatnewpq after compute callback
 	typedef Callback< void , Ptr<Node> , Ptr<Node> > create_new_app_after_compute;
 	create_new_app_after_compute m_create_new_app_after_compute;
+
+	Time GPU_Calculate_time();
+	bool GPU_Calculate();
 
 	void SetNode(Ptr<Node> node);
 	void Setup(QpCompleteCallback cb); // setup shared data and callbacks with the QbbNetDevice

@@ -179,6 +179,7 @@ TypeId RdmaHw::GetTypeId (void)
 }
 
 RdmaHw::RdmaHw(){
+	GPU_waiting_count = 0;
 }
 
 void RdmaHw::SetNode(Ptr<Node> node){
@@ -200,6 +201,21 @@ void RdmaHw::Setup(QpCompleteCallback cb){
 	}
 	// setup qp complete callback
 	m_qpCompleteCallback = cb;
+}
+
+//表示计算时间
+Time RdmaHw::GPU_Calculate_time(){
+	double seconds;
+	seconds = 0.005;//此处需要添加gpu计算时间的表达算法
+	compute_start_time = Simulator::Now();
+	compute_time = seconds;
+	return Time::FromDouble (seconds, Time::S);
+}
+
+bool RdmaHw::GPU_Calculate(){
+	Simulator::Schedule(GPU_Calculate_time() , &RdmaHw::m_create_new_app_after_compute ,this, m_node , m_nextnode);
+	std::cout<<m_node->GetId()<<" ";
+	std::cout<<"start compute"<<" "<<"no."<<total_node_number - round_count + 1<<" "<<"at time"<<Simulator::Now()<<std::endl;
 }
 
 uint32_t RdmaHw::GetNicIdxOfQp(Ptr<RdmaQueuePair> qp){
@@ -310,9 +326,10 @@ int RdmaHw::ReceiveUdp(Ptr<Packet> p, CustomHeader &ch){
 	rxQp->m_ecn_source.total++;
 	rxQp->m_milestone_rx = m_ack_interval;
 
-	if(m_node->GetId()==3){
-		std::cout<<"node."<<m_node->GetId()<<" "<<"at time"<<Simulator::Now()<<" "<<p->getifLast() <<std::endl;
-	}
+	// test
+	// if(m_node->GetId()==3){
+	// 	std::cout<<"node."<<m_node->GetId()<<" "<<"at time"<<Simulator::Now()<<" "<<p->getifLast() <<std::endl;
+	// }
 
 
 	int x = ReceiverCheckSeq(ch.udp.seq, rxQp, payload_size);
@@ -346,11 +363,16 @@ int RdmaHw::ReceiveUdp(Ptr<Packet> p, CustomHeader &ch){
 	}
 	if(x == 1 && p->getifLast() == true && round_count > 1){
 		//ifLast 此处进行表示计算,并新建qp/application发送
-		Simulator::Schedule(Seconds(0.5) , &RdmaHw::m_create_new_app_after_compute ,this, m_node , m_nextnode);
-		
-		std::cout<<m_node->GetId()<<" ";
-		std::cout<<"creat new qp"<<" "<<"no."<<total_node_number - round_count + 1<<" "<<"at time"<<Simulator::Now()<<std::endl;
-		round_count--;
+		if(GPU_waiting_count == 0){
+			GPU_waiting_count++;
+			GPU_Calculate();
+		}//else if(round_count <= 1 && round_count > 1-total_node_number+1){
+
+		//  }
+		 
+		 //else{
+		// 	// Simulator::Schedule(compute_start_time + Seconds(compute_time) - Simulator::Now(), &RdmaHw::GPU_Calculate ,this);
+		// }
 	}
 	return 0;
 }

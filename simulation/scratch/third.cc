@@ -161,6 +161,12 @@ void ScheduleFlowInputs(){
 void create_new_app_after_compute(Ptr<Node> m_node,Ptr<Node> m_nextnode){//表示计算后创建新app、qp
 	Ptr<RdmaHw> m_rdma = m_node->GetObject<RdmaDriver>()->m_rdma;
 	Ptr<RdmaHw> m_nextrdma = m_nextnode->GetObject<RdmaDriver>()->m_rdma;
+	std::cout<<m_node->GetId()<<" "<<"finish compute"<<" "<<"no."<<m_rdma->total_node_number - m_rdma->round_count + 1<<" "<<"at time"<<Simulator::Now()<<std::endl;
+	m_rdma->GPU_waiting_count--;
+	m_rdma->round_count--;
+	if(m_rdma->GPU_waiting_count > 0){
+		m_rdma->GPU_Calculate();
+	}
 	uint32_t port = portNumder[m_node->GetId()][m_nextnode->GetId()]++; // get a new port number
 	RdmaClientHelper clientHelper( 3 , serverAddress[m_node->GetId()], serverAddress[m_nextnode->GetId()], port, m_rdma->dport, m_rdma->maxPacketCount, has_win?(global_t==1?maxBdp:pairBdp[n.Get(m_node->GetId())][n.Get(m_nextnode->GetId())]):0, global_t==1?maxRtt:pairRtt[m_node->GetId()][m_nextnode->GetId()]);
 	ApplicationContainer appCon = clientHelper.Install(n.Get(m_node->GetId()));
