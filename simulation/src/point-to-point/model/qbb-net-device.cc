@@ -93,15 +93,35 @@ namespace ns3 {
 	int RdmaEgressQueue::GetNextQindex(bool paused[]){
 		bool found = false;
 		uint32_t qIndex;
-		if (!paused[ack_q_idx] && m_ackQ->GetNPackets() > 0)
+		if (!paused[ack_q_idx] && m_ackQ->GetNPackets() > 0){
+			// std::cout<<"this is ack"<<std::endl;
 			return -1;
+		}
+			
 
 		// no pkt in highest priority queue, do rr for each qp
 		int res = -1024;
 		uint32_t fcount = m_qpGrp->GetN();
 		uint32_t min_finish_id = 0xffffffff;
 		m_rrlast = 0;//每次先选择最高的
-		for (qIndex = 1; qIndex <= fcount; qIndex++){
+		// std::cout<<fcount<<std::endl;
+		
+		//对优先级进行排序
+		// auto &qps_first = m_qpGrp->m_qps;
+        // int i, j;
+        // for (i = 0; i < fcount - 1; i++){
+        //     for (j = 0; j < fcount - i - 1; j++){
+		// 	    if (qps_first[j]->m_pg > qps_first[j + 1]->m_pg)
+		// 		{
+		// 			Ptr<RdmaQueuePair> res = qps_first[j];
+		// 			qps_first[j] = qps_first[j + 1];
+		// 			qps_first[j + 1] = res;
+		// 		}	
+		// 	}
+
+		// }
+
+		for (qIndex = 0; qIndex <= fcount; qIndex++){
 			uint32_t idx = (qIndex + m_rrlast) % fcount;
 			Ptr<RdmaQueuePair> qp = m_qpGrp->Get(idx);
 			if (!paused[qp->m_pg] && qp->GetBytesLeft() > 0 && !qp->IsWinBound()){

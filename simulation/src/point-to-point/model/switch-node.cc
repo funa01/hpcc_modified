@@ -117,7 +117,7 @@ void SwitchNode::SendToDev(Ptr<Packet>p, CustomHeader &ch){
 		}
 
 		// admission control
-		FlowIdTag t;
+		FlowIdTag t; 
 		p->PeekPacketTag(t);
 		uint32_t inDev = t.GetFlowId();
 		if (qIndex != 0){ //not highest priority
