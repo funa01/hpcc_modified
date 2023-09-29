@@ -206,16 +206,38 @@ void RdmaHw::Setup(QpCompleteCallback cb){
 //表示计算时间
 Time RdmaHw::GPU_Calculate_time(){
 	double seconds;
-	seconds = 0.005;//此处需要添加gpu计算时间的表达算法
+	switch(m_node->GetId()){
+		case 3 :
+			seconds = 0.0005;
+			break;
+		case 4 :
+			seconds = 0.0005;
+			break;
+		case 5 :
+			seconds = 0.001;
+			break;
+		case 6 :
+			seconds = 0.0005;
+			break;
+		default :
+			seconds = 0.0005;
+			std::cout<<"default";
+
+	}
+	// std::cout<<seconds<<std::endl;
+	// seconds = 0.0007;//此处需要添加gpu计算时间的表达算法
+	
 	compute_start_time = Simulator::Now();
 	compute_time = seconds;
 	return Time::FromDouble (seconds, Time::S);
 }
 
 bool RdmaHw::GPU_Calculate(){
+	// std::cout<<m_node->GetId()<<" "<<m_nextnode->GetId()<<std::endl;
 	Simulator::Schedule(GPU_Calculate_time() , &RdmaHw::m_create_new_app_after_compute ,this, m_node , m_nextnode);
 	std::cout<<m_node->GetId()<<" ";
 	std::cout<<"start compute"<<" "<<"no."<<total_node_number - round_count + 1<<" "<<"at time"<<Simulator::Now()<<std::endl;
+	return  true;
 }
 
 uint32_t RdmaHw::GetNicIdxOfQp(Ptr<RdmaQueuePair> qp){
@@ -282,6 +304,7 @@ void RdmaHw::DeleteQueuePair(Ptr<RdmaQueuePair> qp){
 Ptr<RdmaRxQueuePair> RdmaHw::GetRxQp(uint32_t sip, uint32_t dip, uint16_t sport, uint16_t dport, uint16_t pg, bool create){
 	uint64_t key = ((uint64_t)dip << 32) | ((uint64_t)pg << 16) | (uint64_t)dport;
 	auto it = m_rxQpMap.find(key);
+	// std::cout<<key<<std::endl;
 	if (it != m_rxQpMap.end())
 		return it->second;
 	if (create){
@@ -361,18 +384,28 @@ int RdmaHw::ReceiveUdp(Ptr<Packet> p, CustomHeader &ch){
 		m_nic[nic_idx].dev->RdmaEnqueueHighPrioQ(newp);
 		m_nic[nic_idx].dev->TriggerTransmit();
 	}
-	if(x == 1 && p->getifLast() == true && round_count > 1){
-		//ifLast 此处进行表示计算,并新建qp/application发送
+	std::cout<<"node no."<<m_node->GetId()<< " "<<"是否需要发送ack"<< " " <<x<< " "<<"是否为最后一个数据包"<< p->getifLast()<< " "<<"轮次为"<< 4 - receive_round_count + 1<<std::endl;
+	if(x == 1 && p->getifLast() == true && receive_round_count > 1){
+		receive_round_count--;
+		ifLast 此处进行表示计算,并新建qp/application发送
 		if(GPU_waiting_count == 0){
 			GPU_waiting_count++;
+			
 			GPU_Calculate();
-		}//else if(round_count <= 1 && round_count > 1-total_node_number+1){
+		}else if(GPU_waiting_count > 0){
+			GPU_waiting_count++;
+			
+		}
+		
+		
+		
+		else if(round_count <= 1 && round_count > 1-total_node_number+1){
 
-		//  }
+		 }
 		 
-		 //else{
-		// 	// Simulator::Schedule(compute_start_time + Seconds(compute_time) - Simulator::Now(), &RdmaHw::GPU_Calculate ,this);
-		// }
+		 else{
+			// Simulator::Schedule(compute_start_time + Seconds(compute_time) - Simulator::Now(), &RdmaHw::GPU_Calculate ,this);
+		}
 	}
 	return 0;
 }
@@ -473,7 +506,11 @@ int RdmaHw::ReceiveAck(Ptr<Packet> p, CustomHeader &ch){
 }
 
 int RdmaHw::Receive(Ptr<Packet> p, CustomHeader &ch){
+		
+		
+	
 	if (ch.l3Prot == 0x11){ // UDP
+	std::cout<<m_node->GetId()<<"接受"<<Simulator::Now()<<std::endl;
 		ReceiveUdp(p, ch);
 	}else if (ch.l3Prot == 0xFF){ // CNP
 		ReceiveCnp(p, ch);
@@ -581,6 +618,9 @@ void RdmaHw::RedistributeQp(){
 }
 
 Ptr<Packet> RdmaHw::GetNxtPacket(Ptr<RdmaQueuePair> qp){
+	// if(m_node->GetId()==4&&round_count==3){
+		std::cout<<m_node->GetId()<<"发送发送"<<Simulator::Now()<<std::endl;
+	// }
 	uint32_t payload_size = qp->GetBytesLeft();
 	uint32_t bytesLeft = payload_size;
 	if (m_mtu < payload_size)

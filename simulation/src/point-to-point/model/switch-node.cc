@@ -31,7 +31,7 @@ TypeId SwitchNode::GetTypeId (void)
 			MakeUintegerChecker<uint32_t>())
 	.AddAttribute("AckHighPrio",
 			"Set high priority for ACK/NACK or not",
-			UintegerValue(0),
+			UintegerValue(1),//默认为0
 			MakeUintegerAccessor(&SwitchNode::m_ackHighPrio),
 			MakeUintegerChecker<uint32_t>())
 	.AddAttribute("MaxRtt",
