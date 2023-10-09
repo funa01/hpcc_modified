@@ -106,6 +106,7 @@ namespace ns3 {
 		}
 		else
 		{
+			m_rrlast = 0;
 			if (!found)
 			{
 				for (qIndex = 1; qIndex <= qCnt; qIndex++)

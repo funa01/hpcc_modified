@@ -28,7 +28,9 @@ public:
 	RdmaHw();
 
 	uint32_t total_node_number;
-	uint32_t round_count;
+	uint32_t round_count; //处于的轮次 OR 计算处于的轮次 
+	uint32_t receive_count;//收到数据轮数
+
 	Time compute_start_time;//计算的开始时间
 	double compute_time;	//计算的时间
 	bool GPU_available;

@@ -106,6 +106,7 @@ struct Interface{
 };
 map<Ptr<Node>, map<Ptr<Node>, Interface> > nbr2if;
 // Mapping destination to next hop for each node: <node, <dest, <nexthop0, ...> > >
+map<uint32_t , vector<Ptr<Node> > > pods;
 map<Ptr<Node>, map<Ptr<Node>, vector<Ptr<Node> > > > nextHop;
 map<Ptr<Node>, map<Ptr<Node>, uint64_t> > pairDelay;
 map<Ptr<Node>, map<Ptr<Node>, uint64_t> > pairTxDelay;
@@ -167,10 +168,12 @@ void create_new_app_after_compute(Ptr<Node> m_node,Ptr<Node> m_nextnode){//表�
 	if(m_rdma->GPU_waiting_count > 0){
 		m_rdma->GPU_Calculate();
 	}
-	uint32_t port = portNumder[m_node->GetId()][m_nextnode->GetId()]++; // get a new port number
-	RdmaClientHelper clientHelper( 3 , serverAddress[m_node->GetId()], serverAddress[m_nextnode->GetId()], port, m_rdma->dport, m_rdma->maxPacketCount, has_win?(global_t==1?maxBdp:pairBdp[n.Get(m_node->GetId())][n.Get(m_nextnode->GetId())]):0, global_t==1?maxRtt:pairRtt[m_node->GetId()][m_nextnode->GetId()]);
-	ApplicationContainer appCon = clientHelper.Install(n.Get(m_node->GetId()));
-	appCon.Start(Time(0));
+	if(m_rdma->round_count>1){
+		uint32_t port = portNumder[m_node->GetId()][m_nextnode->GetId()]++; // get a new port number
+		RdmaClientHelper clientHelper( 3 , serverAddress[m_node->GetId()], serverAddress[m_nextnode->GetId()], port, m_rdma->dport, m_rdma->maxPacketCount, has_win?(global_t==1?maxBdp:pairBdp[n.Get(m_node->GetId())][n.Get(m_nextnode->GetId())]):0, global_t==1?maxRtt:pairRtt[m_node->GetId()][m_nextnode->GetId()]);
+		ApplicationContainer appCon = clientHelper.Install(n.Get(m_node->GetId()));
+		appCon.Start(Time(0));
+	}
 }
 
 Ipv4Address node_id_to_ip(uint32_t id){
@@ -783,6 +786,45 @@ int main(int argc, char *argv[])
 		qbb.SetDeviceAttribute("DataRate", StringValue(data_rate));
 		qbb.SetChannelAttribute("Delay", StringValue(link_delay));
 
+		vector<Ptr<Node> > now_ptr;
+		Ptr<Node> now_node,add_node;
+		if( snode->GetNodeType() == 0 && dnode->GetNodeType() == 1 ||snode->GetNodeType() == 1 && dnode->GetNodeType() == 0){//放入对应pods
+			if(dnode->GetNodeType() == 1){
+				now_node = dnode;
+				add_node = snode;
+			}else{
+				now_node = snode;
+				add_node = dnode;
+			}
+			
+			pods[now_node->GetId()].push_back(add_node);
+			std::cout<<"pods"<<now_node->GetId()<<"现在有节点";
+			now_ptr=pods[now_node->GetId()];
+			for (size_t i = 0; i < now_ptr.size(); ++i)
+			{
+				std::cout<<now_ptr[i]->GetId()<<' ';
+			}
+			std::cout<<std::endl;
+		}
+
+
+		// if( snode->GetNodeType() == 0 && dnode->GetNodeType() == 1 ){//放入对应pods
+		// 	pods[dnode->GetId()].push_back(snode);
+		// 	std::cout<<"pods"<<dnode->GetId()<<"现在有节点";
+		// 	now_ptr=pods[dnode->GetId()];
+		// }else if(snode->GetNodeType() == 1 && dnode->GetNodeType() == 0 ){
+		// 	pods[snode->GetId()].push_back(dnode);
+		// 	std::cout<<"pods"<<snode->GetId()<<"现在有节点";
+		// 	now_ptr=pods[snode->GetId()];
+		// }
+		// for (size_t i = 0; i < now_ptr.size(); ++i)
+		// {
+		// 	std::cout<<now_ptr[i]->GetId()<<' ';
+		// }
+		// std::cout<<std::endl;
+
+		
+		
 		if (error_rate > 0)
 		{
 			Ptr<RateErrorModel> rem = CreateObject<RateErrorModel>();
@@ -904,6 +946,7 @@ int main(int argc, char *argv[])
 			rdmaHw->SetPintSmplThresh(pint_prob);
 			rdmaHw->total_node_number = node_num - switch_num;//test
 			rdmaHw->round_count =  node_num - switch_num;
+			rdmaHw->receive_count = node_num - switch_num;
 			rdmaHw->m_create_new_app_after_compute = MakeCallback(&create_new_app_after_compute);
 
 

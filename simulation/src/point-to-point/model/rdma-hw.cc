@@ -206,7 +206,27 @@ void RdmaHw::Setup(QpCompleteCallback cb){
 //表示计算时间
 Time RdmaHw::GPU_Calculate_time(){
 	double seconds;
-	seconds = 0.005;//此处需要添加gpu计算时间的表达算法
+	
+	switch(m_node->GetId()){
+		case 3 :
+			seconds = 0.0005;
+			break;
+		case 4 :
+			seconds = 0.0005;
+			break;
+		case 5 :
+			seconds = 0.001;
+			break;
+		case 6 :
+			seconds = 0.0005;
+			break;
+		default :
+			seconds = 0.0005;
+			std::cout<<"default";
+
+	}
+	
+	//此处需要添加gpu计算时间的表达算法
 	compute_start_time = Simulator::Now();
 	compute_time = seconds;
 	return Time::FromDouble (seconds, Time::S);
@@ -215,7 +235,7 @@ Time RdmaHw::GPU_Calculate_time(){
 bool RdmaHw::GPU_Calculate(){
 	Simulator::Schedule(GPU_Calculate_time() , &RdmaHw::m_create_new_app_after_compute ,this, m_node , m_nextnode);
 	std::cout<<m_node->GetId()<<" ";
-	std::cout<<"start compute"<<" "<<"no."<<total_node_number - round_count + 1<<" "<<"at time"<<Simulator::Now()<<std::endl;
+	std::cout<<"start compute"<<" "<<"轮次为"<<total_node_number - round_count + 1<<" "<<"at time"<<Simulator::Now()<<std::endl;
 }
 
 uint32_t RdmaHw::GetNicIdxOfQp(Ptr<RdmaQueuePair> qp){
@@ -361,18 +381,17 @@ int RdmaHw::ReceiveUdp(Ptr<Packet> p, CustomHeader &ch){
 		m_nic[nic_idx].dev->RdmaEnqueueHighPrioQ(newp);
 		m_nic[nic_idx].dev->TriggerTransmit();
 	}
-	if(x == 1 && p->getifLast() == true && round_count > 1){
+	if(x == 1 && p->getifLast() == true && receive_count > 1){
+		receive_count--;
 		//ifLast 此处进行表示计算,并新建qp/application发送
 		if(GPU_waiting_count == 0){
 			GPU_waiting_count++;
 			GPU_Calculate();
-		}//else if(round_count <= 1 && round_count > 1-total_node_number+1){
+		}else if(GPU_waiting_count>0){
+			GPU_waiting_count++;
 
-		//  }
-		 
-		 //else{
-		// 	// Simulator::Schedule(compute_start_time + Seconds(compute_time) - Simulator::Now(), &RdmaHw::GPU_Calculate ,this);
-		// }
+		}
+			
 	}
 	return 0;
 }
