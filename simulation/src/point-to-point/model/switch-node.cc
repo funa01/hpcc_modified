@@ -12,6 +12,9 @@
 #include "ns3/int-header.h"
 #include <cmath>
 
+
+#include <iostream>
+
 namespace ns3 {
 
 TypeId SwitchNode::GetTypeId (void)
@@ -31,7 +34,7 @@ TypeId SwitchNode::GetTypeId (void)
 			MakeUintegerChecker<uint32_t>())
 	.AddAttribute("AckHighPrio",
 			"Set high priority for ACK/NACK or not",
-			UintegerValue(0),
+			UintegerValue(1),
 			MakeUintegerAccessor(&SwitchNode::m_ackHighPrio),
 			MakeUintegerChecker<uint32_t>())
 	.AddAttribute("MaxRtt",
@@ -203,6 +206,9 @@ void SwitchNode::SwitchNotifyDequeue(uint32_t ifIndex, uint32_t qIndex, Ptr<Pack
 		if (m_ecnEnabled){
 			bool egressCongested = m_mmu->ShouldSendCN(ifIndex, qIndex);
 			if (egressCongested){
+				// if(GetId() == 2 && ifIndex == 1){
+				// 	std::cout<<"ecn"<<std::endl;
+				// }
 				PppHeader ppp;
 				Ipv4Header h;
 				p->RemoveHeader(ppp);

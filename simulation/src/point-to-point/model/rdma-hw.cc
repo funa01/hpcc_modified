@@ -2,6 +2,7 @@
 #include <ns3/seq-ts-header.h>
 #include <ns3/udp-header.h>
 #include <ns3/ipv4-header.h>
+#include <ns3/rdma-driver.h>
 #include "ns3/ppp-header.h"
 #include "ns3/boolean.h"
 #include "ns3/uinteger.h"
@@ -12,6 +13,9 @@
 #include "ppp-header.h"
 #include "qbb-header.h"
 #include "cn-header.h"
+
+#include <fstream>
+#include <iomanip>
 
 namespace ns3{
 
@@ -203,22 +207,26 @@ void RdmaHw::Setup(QpCompleteCallback cb){
 	m_qpCompleteCallback = cb;
 }
 
+bool RdmaHw::SetPods(std::map<uint32_t , std::vector<Ptr<Node> > > pods){
+	all_pods = pods;
+}
+
 //表示计算时间
 Time RdmaHw::GPU_Calculate_time(){
 	double seconds;
 	
 	switch(m_node->GetId()){
 		case 3 :
-			seconds = 0.0005;
+			seconds = 0.11;
 			break;
 		case 4 :
-			seconds = 0.0005;
+			seconds = 0.071;
 			break;
 		case 5 :
-			seconds = 0.001;
+			seconds = 0.045;
 			break;
 		case 6 :
-			seconds = 0.0005;
+			seconds = 0.045;
 			break;
 		default :
 			seconds = 0.0005;
@@ -233,9 +241,15 @@ Time RdmaHw::GPU_Calculate_time(){
 }
 
 bool RdmaHw::GPU_Calculate(){
+	
+	
 	Simulator::Schedule(GPU_Calculate_time() , &RdmaHw::m_create_new_app_after_compute ,this, m_node , m_nextnode);
 	std::cout<<m_node->GetId()<<" ";
-	std::cout<<"start compute"<<" "<<"轮次为"<<total_node_number - round_count + 1<<" "<<"at time"<<Simulator::Now()<<std::endl;
+	std::cout<<"start compute"<<" "<<"轮次为"<<total_node_number - round_count + 1<<" "<<"at time"<<" "<<Simulator::Now().GetSeconds ()<<"s"<<std::endl;
+}
+
+bool RdmaHw::prio_dispatch(){
+
 }
 
 uint32_t RdmaHw::GetNicIdxOfQp(Ptr<RdmaQueuePair> qp){
@@ -334,7 +348,9 @@ void RdmaHw::DeleteRxQp(uint32_t dip, uint16_t pg, uint16_t dport){
 
 int RdmaHw::ReceiveUdp(Ptr<Packet> p, CustomHeader &ch){
 	uint8_t ecnbits = ch.GetIpv4EcnBits();
-
+		// if(m_node->GetId() == 4 && +ecnbits != 0){
+		// 	std::cout<<+ecnbits<<std::endl;
+		// }
 	uint32_t payload_size = p->GetSize() - ch.GetSerializedSize();
 
 	// TODO find corresponding rx queue pair
@@ -381,15 +397,25 @@ int RdmaHw::ReceiveUdp(Ptr<Packet> p, CustomHeader &ch){
 		m_nic[nic_idx].dev->RdmaEnqueueHighPrioQ(newp);
 		m_nic[nic_idx].dev->TriggerTransmit();
 	}
+	if(p->getifLast() == true && m_node->GetId()==3){
+		std::cout<<"last!"<<std::endl;
+		// Simulator::Stop();
+	}
+
+
 	if(x == 1 && p->getifLast() == true && receive_count > 1){
+		std::cout<<m_node->GetId()<<" ";
+		std::cout<<"成功接收所有"<<" "<<"轮次为"<<total_node_number - receive_count + 1<<" "<<"的数据包"<<"at time"<<" "<<Simulator::Now().GetSeconds ()<<"s"<<std::endl;
+		// std::cout<<"node."<<m_node->GetId()<<" "<<"在第"<<total_node_number - receive_count + 1<<"轮，用时"<<Simulator::Now().GetSeconds ()<<std::endl;
 		receive_count--;
+		receivetime = Simulator::Now();
+		
 		//ifLast 此处进行表示计算,并新建qp/application发送
 		if(GPU_waiting_count == 0){
 			GPU_waiting_count++;
 			GPU_Calculate();
 		}else if(GPU_waiting_count>0){
 			GPU_waiting_count++;
-
 		}
 			
 	}
@@ -464,6 +490,9 @@ int RdmaHw::ReceiveAck(Ptr<Packet> p, CustomHeader &ch){
 			qp->Acknowledge(goback_seq);
 		}
 		if (qp->IsFinished()){
+			std::cout<<m_node->GetId()<<" ";
+			std::cout<<"发送轮次为"<<total_node_number - send_count + 1<<" "<<"的数据包"<<"用时"<<" "<<m_nextnode->GetObject<RdmaDriver>()->m_rdma->receivetime.GetSeconds() - sendtime.GetSeconds() <<"s"<<std::endl;
+			send_count--;
 			QpComplete(qp);
 		}
 	}
@@ -613,10 +642,14 @@ Ptr<Packet> RdmaHw::GetNxtPacket(Ptr<RdmaQueuePair> qp){
 
 	if(bytesLeft <= m_mtu){
 		p->setifLast(true);
+		if(m_node->GetId()==6){
+			std::cout<<"node."<<m_node->GetId()<<" "<<"at time"<<Simulator::Now()<<" "<<"发送到3最后一个数据包"<<std::endl;
+		}
 	}else{
 		p->setifLast(false);
 	}
 
+	p->setRound(total_node_number - receive_count);
 	// add SeqTsHeader
 	SeqTsHeader seqTs;
 	seqTs.SetSeq (qp->snd_nxt);

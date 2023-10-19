@@ -9,6 +9,8 @@
 #include <unordered_map>
 #include "pint.h"
 
+
+
 namespace ns3 {
 
 struct RdmaInterfaceMgr{
@@ -27,9 +29,13 @@ public:
 	static TypeId GetTypeId (void);
 	RdmaHw();
 
+	std::map<uint32_t , std::vector<Ptr<Node> > > all_pods; //路由器分组
+
+	Ptr<Node> direct_swicth_node;
 	uint32_t total_node_number;
 	uint32_t round_count; //处于的轮次 OR 计算处于的轮次 
 	uint32_t receive_count;//收到数据轮数
+	uint32_t send_count;
 
 	Time compute_start_time;//计算的开始时间
 	double compute_time;	//计算的时间
@@ -41,6 +47,9 @@ public:
 	Ptr<Node> m_node;
 	Ptr<Node> m_nextnode;	//下一个节点信息
 	DataRate m_minRate;		//< Min sending rate
+	uint32_t m_pg;
+	Time sendtime;
+	Time receivetime;
 	uint32_t m_mtu;
 	uint32_t m_cc_mode;
 	double m_nack_interval;
@@ -62,8 +71,12 @@ public:
 	typedef Callback< void , Ptr<Node> , Ptr<Node> > create_new_app_after_compute;
 	create_new_app_after_compute m_create_new_app_after_compute;
 
+	bool SetPods(std::map<uint32_t , std::vector<Ptr<Node> > > pods);
+
 	Time GPU_Calculate_time();
-	bool GPU_Calculate();
+	bool GPU_Calculate();//gpu计算时间模拟
+
+	bool prio_dispatch();//一个节点传输结束后的优先级调度
 
 	void SetNode(Ptr<Node> node);
 	void Setup(QpCompleteCallback cb); // setup shared data and callbacks with the QbbNetDevice

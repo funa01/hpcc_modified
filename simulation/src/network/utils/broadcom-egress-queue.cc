@@ -106,9 +106,10 @@ namespace ns3 {
 		}
 		else
 		{
-			m_rrlast = 0;
+			
 			if (!found)
 			{
+				m_rrlast = 0;
 				for (qIndex = 1; qIndex <= qCnt; qIndex++)
 				{
 					if (!paused[(qIndex + m_rrlast) % qCnt] && m_queues[(qIndex + m_rrlast) % qCnt]->GetNPackets() > 0)  //round robin
@@ -121,7 +122,8 @@ namespace ns3 {
 			}
 		}
 		if (found)
-		{
+		{	
+
 			Ptr<Packet> p = m_queues[qIndex]->Dequeue();
 			m_traceBeqDequeue(p, qIndex);
 			m_bytesInQueueTotal -= p->GetSize();

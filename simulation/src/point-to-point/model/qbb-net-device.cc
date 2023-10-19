@@ -49,10 +49,20 @@
 
 #include <iostream>
 
+#include <fstream>
+#include <iomanip>
+
+// using std::ofstream;
+
 NS_LOG_COMPONENT_DEFINE("QbbNetDevice");
 
+
+
 namespace ns3 {
+
 	
+
+
 	uint32_t RdmaEgressQueue::ack_q_idx = 3;
 	// RdmaEgressQueue
 	TypeId RdmaEgressQueue::GetTypeId (void)
@@ -81,7 +91,7 @@ namespace ns3 {
 			m_traceRdmaDequeue(p, 0);
 			return p;
 		}
-		if (qIndex >= 0){ // qp
+		if (qIndex >= 0){ // qp	
 			Ptr<Packet> p = m_rdmaGetNxtPkt(m_qpGrp->Get(qIndex));
 			m_rrlast = qIndex;
 			m_qlast = qIndex;
@@ -221,6 +231,7 @@ namespace ns3 {
 
 	QbbNetDevice::QbbNetDevice()
 	{
+		out_txt_file.open("/home/fac/High-Precision-Congestion-Control-master/simulation/src/point-to-point/model/note/switch2_nic1.txt", std::ios::out);
 		NS_LOG_FUNCTION(this);
 		m_ecn_source = new std::vector<ECNAccount>;
 		for (uint32_t i = 0; i < qCnt; i++){
@@ -263,6 +274,17 @@ namespace ns3 {
 		if (m_txMachineState == BUSY) return;	// Quit if channel busy
 		Ptr<Packet> p;
 		if (m_node->GetNodeType() == 0){
+			// if(m_node->GetId() == 5  && m_ifIndex == 1){
+			// 	for(int count = 0;count<8;count++){
+			// 		if(m_paused[count]){
+			// 			out_txt_file<<"paused!"<<" ";
+			// 		}else{
+			// 			out_txt_file<<"un_paused!"<<" ";
+			// 		}
+			// 	}
+			// 	// out_txt_file << std::endl;
+			// }
+
 			int qIndex = m_rdmaEQ->GetNextQindex(m_paused);
 			if (qIndex != -1024){
 				if (qIndex == -1){ // high prio
@@ -274,6 +296,10 @@ namespace ns3 {
 				// a qp dequeue a packet
 				Ptr<RdmaQueuePair> lastQp = m_rdmaEQ->GetQp(qIndex);
 				p = m_rdmaEQ->DequeueQindex(qIndex);
+
+				// if(m_node->GetId() == 6){
+				// 	std::cout<<lastQp->m_rate<<std::endl;
+				// }
 
 				// transmit
 				m_traceQpDequeue(p, lastQp);
@@ -296,7 +322,38 @@ namespace ns3 {
 			}
 			return;
 		}else{   //switch, doesn't care about qcn, just send
+
+
+
+
+			// if(m_node->GetId() == 2  && m_ifIndex == 1){	//打印优先级队列
+			// 	std::cout<<"before ";
+			// 	out_txt_file <<"取包发送之前";
+			// 	// std::cout<<m_queue->m_bytesInQueue[i]<<"";
+			// 	for(int i=0;i<=qCnt ;i++){
+			// 		std::cout<<m_queue->GetNBytes(i)<<" ";
+			// 		out_txt_file <<m_queue->GetNBytes(i)<<" ";//打印优先级队列的包
+			// 	}
+			// 	std::cout<<std::endl;
+			// 	out_txt_file << std::endl;
+			// }
+				
 			p = m_queue->DequeueRR(m_paused);		//this is round-robin
+
+			// if(m_node->GetId() == 2 && m_ifIndex == 1){	//打印取包后的优先级队列
+			// 	std::cout<<"after ";
+			// 	out_txt_file <<"取包发送之后";
+			// 	// std::cout<<m_queue->m_bytesInQueue[i]<<"";
+			// 	for(int i=0;i<=qCnt ;i++){
+			// 		std::cout<<m_queue->GetNBytes(i)<<" ";
+			// 		out_txt_file<<m_queue->GetNBytes(i)<<" ";//打印优先级队列的包
+			// 	}
+			// 	std::cout<<std::endl;
+			// 	std::cout<<std::endl;
+			// 	out_txt_file << std::endl;
+			// 	out_txt_file << std::endl;
+			// }
+
 			if (p != 0){
 				m_snifferTrace(p);
 				m_promiscSnifferTrace(p);
@@ -307,6 +364,7 @@ namespace ns3 {
 				packet->RemoveHeader(h);
 				FlowIdTag t;
 				uint32_t qIndex = m_queue->GetLastQueue();
+				
 				if (qIndex == 0){//this is a pause or cnp, send it immediately!
 					m_node->SwitchNotifyDequeue(m_ifIndex, qIndex, p);
 					p->RemovePacketTag(t);
@@ -450,6 +508,9 @@ namespace ns3 {
 		m_currentPkt = p;
 		m_phyTxBeginTrace(m_currentPkt);
 		Time txTime = Seconds(m_bps.CalculateTxTime(p->GetSize()));
+		// if(m_node->GetId() == 5 && m_ifIndex == 1){
+		// 	out_txt_file<<m_bps.GetBitRate()<<" "<<std::endl;
+		// }
 		Time txCompleteTime = txTime + m_tInterframeGap;
 		NS_LOG_LOGIC("Schedule TransmitCompleteEvent in " << txCompleteTime.GetSeconds() << "sec");
 		Simulator::Schedule(txCompleteTime, &QbbNetDevice::TransmitComplete, this);

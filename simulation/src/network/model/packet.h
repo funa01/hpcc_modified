@@ -580,6 +580,9 @@ public:
   bool setifLast( bool flag);
   bool getifLast(void) const;
 
+  bool setRound( uint8_t round_count );
+  uint8_t getRound(void) const;
+
 private:
   Packet (const Buffer &buffer, const ByteTagList &byteTagList, 
           const PacketTagList &packetTagList, const PacketMetadata &metadata);
@@ -593,6 +596,7 @@ private:
 
   uint8_t iflast;//iflast
   bool ifLast;
+  uint8_t Round;
 
 
   /* Please see comments above about nix-vector */

@@ -33,9 +33,14 @@
 #include<map>
 #include <ns3/rdma.h>
 
+#include <fstream>
+#include <iomanip>
+
 namespace ns3 {
 
 class RdmaEgressQueue : public Object{
+
+
 public:
 	static const uint32_t qCnt = 8;
 	static uint32_t ack_q_idx;
@@ -70,6 +75,7 @@ public:
  */
 class QbbNetDevice : public PointToPointNetDevice 
 {
+  std::ofstream out_txt_file;
 public:
   static const uint32_t qCnt = 8;	// Number of queues/priorities used
 
@@ -196,6 +202,10 @@ public:
 	// callback for sent a packet
 	typedef Callback<void, Ptr<RdmaQueuePair>, Ptr<Packet>, Time> RdmaPktSent;
 	RdmaPktSent m_rdmaPktSent;
+
+  // callback for round
+ 	typedef Callback<void, uint32_t > RdmaRoundCount;
+	RdmaRoundCount m_RdmaRoundCount; 
 
 	Ptr<RdmaEgressQueue> GetRdmaQueue();
 	void TakeDown(); // take down this device

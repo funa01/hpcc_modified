@@ -107,6 +107,7 @@ struct Interface{
 map<Ptr<Node>, map<Ptr<Node>, Interface> > nbr2if;
 // Mapping destination to next hop for each node: <node, <dest, <nexthop0, ...> > >
 map<uint32_t , vector<Ptr<Node> > > pods;
+map<Ptr<Node> , Ptr<Node>> server_to_switch;
 map<Ptr<Node>, map<Ptr<Node>, vector<Ptr<Node> > > > nextHop;
 map<Ptr<Node>, map<Ptr<Node>, uint64_t> > pairDelay;
 map<Ptr<Node>, map<Ptr<Node>, uint64_t> > pairTxDelay;
@@ -140,6 +141,7 @@ void ScheduleFlowInputs(){
 		m_rdma->m_nextnode = n.Get(flow_input.dst);
 		m_rdma->dport = flow_input.dport;
 		m_rdma->maxPacketCount = flow_input.maxPacketCount;
+		m_rdma->m_pg = flow_input.pg;
 
 		uint32_t port = portNumder[flow_input.src][flow_input.dst]++; // get a new port number 
 		RdmaClientHelper clientHelper(flow_input.pg, serverAddress[flow_input.src], serverAddress[flow_input.dst], port, flow_input.dport, flow_input.maxPacketCount, has_win?(global_t==1?maxBdp:pairBdp[n.Get(flow_input.src)][n.Get(flow_input.dst)]):0, global_t==1?maxRtt:pairRtt[flow_input.src][flow_input.dst]);
@@ -162,15 +164,18 @@ void ScheduleFlowInputs(){
 void create_new_app_after_compute(Ptr<Node> m_node,Ptr<Node> m_nextnode){//表示计算后创建新app、qp
 	Ptr<RdmaHw> m_rdma = m_node->GetObject<RdmaDriver>()->m_rdma;
 	Ptr<RdmaHw> m_nextrdma = m_nextnode->GetObject<RdmaDriver>()->m_rdma;
-	std::cout<<m_node->GetId()<<" "<<"finish compute"<<" "<<"no."<<m_rdma->total_node_number - m_rdma->round_count + 1<<" "<<"at time"<<Simulator::Now()<<std::endl;
+	m_rdma->sendtime = Simulator::Now();
+	std::cout<<m_node->GetId()<<" "<<"finish compute"<<" "<<"no."<<m_rdma->total_node_number - m_rdma->round_count + 1<<" "<<"at time"<<" "<<Simulator::Now().GetSeconds ()<<"s"<<std::endl;
+	
 	m_rdma->GPU_waiting_count--;
 	m_rdma->round_count--;
 	if(m_rdma->GPU_waiting_count > 0){
 		m_rdma->GPU_Calculate();
 	}
 	if(m_rdma->round_count>1){
+		std::cout<<m_node->GetId()<<" "<<"开始发送 轮次为"<<" "<<"no."<<m_rdma->total_node_number - m_rdma->round_count + 1<<"数据包"<<" "<<"at time"<<" "<<Simulator::Now().GetSeconds ()<<"s"<<std::endl;
 		uint32_t port = portNumder[m_node->GetId()][m_nextnode->GetId()]++; // get a new port number
-		RdmaClientHelper clientHelper( 3 , serverAddress[m_node->GetId()], serverAddress[m_nextnode->GetId()], port, m_rdma->dport, m_rdma->maxPacketCount, has_win?(global_t==1?maxBdp:pairBdp[n.Get(m_node->GetId())][n.Get(m_nextnode->GetId())]):0, global_t==1?maxRtt:pairRtt[m_node->GetId()][m_nextnode->GetId()]);
+		RdmaClientHelper clientHelper( m_rdma->m_pg , serverAddress[m_node->GetId()], serverAddress[m_nextnode->GetId()], port, m_rdma->dport, m_rdma->maxPacketCount, has_win?(global_t==1?maxBdp:pairBdp[n.Get(m_node->GetId())][n.Get(m_nextnode->GetId())]):0, global_t==1?maxRtt:pairRtt[m_node->GetId()][m_nextnode->GetId()]);
 		ApplicationContainer appCon = clientHelper.Install(n.Get(m_node->GetId()));
 		appCon.Start(Time(0));
 	}
@@ -796,7 +801,7 @@ int main(int argc, char *argv[])
 				now_node = snode;
 				add_node = dnode;
 			}
-			
+			server_to_switch.insert(pair<Ptr<Node>, Ptr<Node>>(add_node, now_node));
 			pods[now_node->GetId()].push_back(add_node);
 			std::cout<<"pods"<<now_node->GetId()<<"现在有节点";
 			now_ptr=pods[now_node->GetId()];
@@ -947,8 +952,13 @@ int main(int argc, char *argv[])
 			rdmaHw->total_node_number = node_num - switch_num;//test
 			rdmaHw->round_count =  node_num - switch_num;
 			rdmaHw->receive_count = node_num - switch_num;
+			rdmaHw->send_count = node_num - switch_num;
 			rdmaHw->m_create_new_app_after_compute = MakeCallback(&create_new_app_after_compute);
+			rdmaHw->SetPods(pods);
 
+			map<Ptr<Node>, Ptr<Node>>::iterator iter = server_to_switch.find(n.Get(i));
+			rdmaHw->direct_swicth_node = iter->second;
+			// std::cout<<rdmaHw->direct_swicth_node->GetId()<<std::endl;
 
 
 			// create and install RdmaDriver
@@ -1064,6 +1074,8 @@ int main(int argc, char *argv[])
 					portNumder[i][j] = 10000; // each host pair use port number from 10000
 			}
 	}
+	
+	
 
 	flow_input.idx = 0;
 	if (flow_num > 0){

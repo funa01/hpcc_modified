@@ -904,6 +904,14 @@ bool Packet::getifLast(void) const{
   return ifLast;
 }
 
+bool Packet::setRound( uint8_t round_count ){
+  Round = round_count;
+  return 1;
+}
+uint8_t Packet::getRound(void) const{
+  return Round;
+}
+
 
 PacketTagIterator 
 Packet::GetPacketTagIterator (void) const
