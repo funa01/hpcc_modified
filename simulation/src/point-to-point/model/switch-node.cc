@@ -12,6 +12,8 @@
 #include "ns3/int-header.h"
 #include <cmath>
 
+#include <fstream>
+#include <iomanip>
 
 #include <iostream>
 
@@ -47,6 +49,7 @@ TypeId SwitchNode::GetTypeId (void)
 }
 
 SwitchNode::SwitchNode(){
+	out_txt_file_ecn.open("/home/fac/High-Precision-Congestion-Control-master/simulation/src/point-to-point/model/note/when_get_ecn", std::ios::out|std::ios::trunc);
 	m_ecmpSeed = m_id;
 	m_node_type = 1;
 	m_mmu = CreateObject<SwitchMmu>();
@@ -198,17 +201,54 @@ bool SwitchNode::SwitchReceiveFromDevice(Ptr<NetDevice> device, Ptr<Packet> pack
 void SwitchNode::SwitchNotifyDequeue(uint32_t ifIndex, uint32_t qIndex, Ptr<Packet> p){
 	FlowIdTag t;
 	p->PeekPacketTag(t);
+	uint32_t inDev = t.GetFlowId();
+
+		// if(GetId() ==2 && ifIndex == 1){
+		// 	out_txt_file_ecn<<"egress_bytes当前出包前的优先级队列 ";
+		// 	for(int i=0;i <= m_mmu->qCnt ;i++){
+		// 		// std::cout<<m_queue->GetNBytes(i)<<" ";
+		// 		out_txt_file_ecn <<m_mmu->egress_bytes[ifIndex][i]<<" ";//打印优先级队列的包
+		// 	}
+		// 	out_txt_file_ecn<<std::endl;
+		// }
+
 	if (qIndex != 0){
 		uint32_t inDev = t.GetFlowId();
 		m_mmu->RemoveFromIngressAdmission(inDev, qIndex, p->GetSize());
 		m_mmu->RemoveFromEgressAdmission(ifIndex, qIndex, p->GetSize());
 		m_bytes[inDev][ifIndex][qIndex] -= p->GetSize();
 		if (m_ecnEnabled){
+
+			// if(GetId() ==2 && ifIndex == 1){
+			// 	out_txt_file_ecn<<"egress_bytes当前出包后的优先级队列 ";
+			// 	for(int i=0;i <= m_mmu->qCnt ;i++){
+			//  		// std::cout<<m_queue->GetNBytes(i)<<" ";
+			// 		out_txt_file_ecn <<m_mmu->egress_bytes[ifIndex][i]<<" ";//打印优先级队列的包
+			// 	}
+			// 	out_txt_file_ecn<<std::endl;
+			// }
+
 			bool egressCongested = m_mmu->ShouldSendCN(ifIndex, qIndex);
+
+
+			// if(egressCongested && GetId() ==2 &&ifIndex == 1){
+			// 	out_txt_file_ecn<<"节点"<<GetId()<<" interface"<<ifIndex<<" 优先级"<<qIndex<<" 打印ecn标记时，优先级队列中有"<<m_bytes[inDev][ifIndex][qIndex]<<" at time " << Simulator::Now ().GetSeconds() <<std::endl;
+			// 	std::cout<<"节点"<<GetId()<<" interface"<<ifIndex<<" 优先级"<<qIndex<<" 打印ecn标记时，优先级队列中有"<<m_bytes[inDev][ifIndex][qIndex]<<" at time " << Simulator::Now ().GetSeconds() <<std::endl;
+			// }
+			// if(GetId() ==2 && ifIndex == 1){
+			// 	out_txt_file_ecn<<std::endl;
+			// }
+
+
 			if (egressCongested){
+
 				// if(GetId() == 2 && ifIndex == 1){
+				// 	CustomHeader ch(CustomHeader::L2_Header | CustomHeader::L3_Header | CustomHeader::L4_Header);
+				// 	p->PeekHeader(ch);
+				// 	if(ch.sip == 184550657)
 				// 	std::cout<<"ecn"<<std::endl;
 				// }
+
 				PppHeader ppp;
 				Ipv4Header h;
 				p->RemoveHeader(ppp);

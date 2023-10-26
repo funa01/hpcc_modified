@@ -1,0 +1,113 @@
+ENABLE_QCN			Yes
+USE_DYNAMIC_PFC_THRESHOLD	Yes
+PACKET_PAYLOAD_SIZE		1000
+TOPOLOGY_FILE			mix/topology.txt
+FLOW_FILE			mix/flow.txt
+TRACE_FILE			mix/trace.txt
+TRACE_OUTPUT_FILE		mix/mix.tr
+FCT_OUTPUT_FILE		mix/fct.txt
+PFC_OUTPUT_FILE				mix/pfc.txt
+SIMULATOR_STOP_TIME		4
+CC_MODE		1
+ALPHA_RESUME_INTERVAL		1
+RATE_DECREASE_INTERVAL		4
+CLAMP_TARGET_RATE		No
+RP_TIMER			900
+EWMA_GAIN			0.00390625
+FAST_RECOVERY_TIMES		1
+RATE_AI				50Mb/s
+RATE_HAI			100Mb/s
+MIN_RATE		100Mb/s
+DCTCP_RATE_AI				1000Mb/s
+ERROR_RATE_PER_LINK		0
+L2_CHUNK_SIZE			1000
+L2_ACK_INTERVAL			1
+L2_BACK_TO_ZERO			No
+HAS_WIN		1
+GLOBAL_T		1
+VAR_WIN		0
+FAST_REACT		1
+U_TARGET		0.95
+MI_THRESH		0
+INT_MULTI				1
+MULTI_RATE				0
+SAMPLE_FEEDBACK				0
+PINT_LOG_BASE				1.05
+PINT_PROB				1
+RATE_BOUND		1
+ACK_HIGH_PRIO		0
+LINK_DOWN				0 0 0
+ENABLE_TRACE				1
+KMAX_MAP				 25000000000 400 50000000000 800 100000000000 1600
+KMIN_MAP				 25000000000 100 50000000000 200 100000000000 400
+PMAX_MAP				 25000000000 0.2 50000000000 0.2 100000000000 0.2
+BUFFER_SIZE				64
+QLEN_MON_FILE				mix/qlen.txt
+QLEN_MON_START				2000000000
+QLEN_MON_END				2010000000
+pods1现在有节点3 
+pods1现在有节点3 4 
+pods2现在有节点5 
+pods2现在有节点5 6 
+maxRtt=400640 maxBdp=2504000
+Running Simulation.
+node.6 at time0.00340092s 发送到3最后一个数据包
+节点3 成功接收所有 轮次为1 的数据包at time 0.0036411s
+3 start compute 轮次为1 at time 0.0036411s
+节点6 发送轮次为1 的数据包用时 0.0036411s
+节点4 成功接收所有 轮次为1 的数据包at time 0.00914655s
+4 start compute 轮次为1 at time 0.00914655s
+节点5 发送轮次为1 的数据包用时 0.00914655s
+节点6 成功接收所有 轮次为1 的数据包at time 0.0115409s
+6 start compute 轮次为1 at time 0.0115409s
+节点5 成功接收所有 轮次为1 的数据包at time 0.0116541s
+5 start compute 轮次为1 at time 0.0116541s
+节点4 发送轮次为1 的数据包用时 0.0115409s
+节点3 发送轮次为1 的数据包用时 0.0116541s
+节点6 finish compute no.1 at time 0.0565409s
+节点6 开始发送 轮次为 no.2数据包 at time 0.0565409s
+节点5 finish compute no.1 at time 0.0566541s
+节点5 开始发送 轮次为 no.2数据包 at time 0.0566541s
+node.6 at time0.0598807s 发送到3最后一个数据包
+节点3 成功接收所有 轮次为2 的数据包at time 0.0600814s
+节点6 发送轮次为2 的数据包用时 0.0035405s
+节点4 成功接收所有 轮次为2 的数据包at time 0.0655256s
+节点5 发送轮次为2 的数据包用时 0.00887156s
+节点4 finish compute no.1 at time 0.0801466s
+4 start compute 轮次为2 at time 0.0801466s
+节点4 开始发送 轮次为 no.2数据包 at time 0.0801466s
+节点6 成功接收所有 轮次为2 的数据包at time 0.0836871s
+6 start compute 轮次为2 at time 0.0836871s
+节点4 发送轮次为2 的数据包用时 0.0035405s
+节点3 finish compute no.1 at time 0.113641s
+3 start compute 轮次为2 at time 0.113641s
+节点3 开始发送 轮次为 no.2数据包 at time 0.113641s
+节点5 成功接收所有 轮次为2 的数据包at time 0.117182s
+5 start compute 轮次为2 at time 0.117182s
+节点3 发送轮次为2 的数据包用时 0.0035405s
+节点6 finish compute no.2 at time 0.128687s
+节点6 开始发送 轮次为 no.3数据包 at time 0.128687s
+node.6 at time0.132027s 发送到3最后一个数据包
+节点3 成功接收所有 轮次为3 的数据包at time 0.132228s
+节点6 发送轮次为3 的数据包用时 0.0035405s
+节点4 finish compute no.2 at time 0.151147s
+节点4 开始发送 轮次为 no.3数据包 at time 0.151147s
+节点6 成功接收所有 轮次为3 的数据包at time 0.154687s
+6 start compute 轮次为3 at time 0.154687s
+节点4 发送轮次为3 的数据包用时 0.0035405s
+节点5 finish compute no.2 at time 0.162182s
+节点5 开始发送 轮次为 no.3数据包 at time 0.162182s
+节点4 成功接收所有 轮次为3 的数据包at time 0.165722s
+4 start compute 轮次为3 at time 0.165722s
+节点5 发送轮次为3 的数据包用时 0.0035405s
+节点6 finish compute no.3 at time 0.199687s
+节点3 finish compute no.2 at time 0.223641s
+3 start compute 轮次为3 at time 0.223641s
+节点3 开始发送 轮次为 no.3数据包 at time 0.223641s
+节点5 成功接收所有 轮次为3 的数据包at time 0.227182s
+5 start compute 轮次为3 at time 0.227182s
+节点3 发送轮次为3 的数据包用时 0.0035405s
+节点4 finish compute no.3 at time 0.236722s
+节点5 finish compute no.3 at time 0.272182s
+节点3 finish compute no.3 at time 0.333641s
+68.8342

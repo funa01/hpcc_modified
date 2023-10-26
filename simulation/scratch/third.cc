@@ -37,10 +37,16 @@
 #include <ns3/switch-node.h>
 #include <ns3/sim-setting.h>
 
+
+#include <iomanip>
+
 using namespace ns3;
 using namespace std;
 
 NS_LOG_COMPONENT_DEFINE("GENERIC_SIMULATION");
+
+
+std::ofstream out_txt_file;
 
 uint32_t cc_mode = 1;
 bool enable_qcn = true, use_dynamic_pfc_threshold = true;
@@ -165,7 +171,8 @@ void create_new_app_after_compute(Ptr<Node> m_node,Ptr<Node> m_nextnode){//表�
 	Ptr<RdmaHw> m_rdma = m_node->GetObject<RdmaDriver>()->m_rdma;
 	Ptr<RdmaHw> m_nextrdma = m_nextnode->GetObject<RdmaDriver>()->m_rdma;
 	m_rdma->sendtime = Simulator::Now();
-	std::cout<<m_node->GetId()<<" "<<"finish compute"<<" "<<"no."<<m_rdma->total_node_number - m_rdma->round_count + 1<<" "<<"at time"<<" "<<Simulator::Now().GetSeconds ()<<"s"<<std::endl;
+	// out_txt_file<<m_node->GetId()<<" "<<"finish compute"<<" "<<"no."<<m_rdma->total_node_number - m_rdma->round_count + 1<<" "<<"at time"<<" "<<Simulator::Now().GetSeconds ()<<"s"<<std::endl;
+	std::cout<<"节点"<<m_node->GetId()<<" "<<"finish compute"<<" "<<"no."<<m_rdma->total_node_number - m_rdma->round_count + 1<<" "<<"at time"<<" "<<Simulator::Now().GetSeconds ()<<"s"<<std::endl;
 	
 	m_rdma->GPU_waiting_count--;
 	m_rdma->round_count--;
@@ -173,7 +180,8 @@ void create_new_app_after_compute(Ptr<Node> m_node,Ptr<Node> m_nextnode){//表�
 		m_rdma->GPU_Calculate();
 	}
 	if(m_rdma->round_count>1){
-		std::cout<<m_node->GetId()<<" "<<"开始发送 轮次为"<<" "<<"no."<<m_rdma->total_node_number - m_rdma->round_count + 1<<"数据包"<<" "<<"at time"<<" "<<Simulator::Now().GetSeconds ()<<"s"<<std::endl;
+		// out_txt_file<<m_node->GetId()<<" "<<"开始发送 轮次为"<<" "<<"no."<<m_rdma->total_node_number - m_rdma->round_count + 1<<"数据包"<<" "<<"at time"<<" "<<Simulator::Now().GetSeconds ()<<"s"<<std::endl;
+		std::cout<<"节点"<<m_node->GetId()<<" "<<"开始发送 轮次为"<<" "<<"no."<<m_rdma->total_node_number - m_rdma->round_count + 1<<"数据包"<<" "<<"at time"<<" "<<Simulator::Now().GetSeconds ()<<"s"<<std::endl;
 		uint32_t port = portNumder[m_node->GetId()][m_nextnode->GetId()]++; // get a new port number
 		RdmaClientHelper clientHelper( m_rdma->m_pg , serverAddress[m_node->GetId()], serverAddress[m_nextnode->GetId()], port, m_rdma->dport, m_rdma->maxPacketCount, has_win?(global_t==1?maxBdp:pairBdp[n.Get(m_node->GetId())][n.Get(m_nextnode->GetId())]):0, global_t==1?maxRtt:pairRtt[m_node->GetId()][m_nextnode->GetId()]);
 		ApplicationContainer appCon = clientHelper.Install(n.Get(m_node->GetId()));
@@ -692,6 +700,9 @@ int main(int argc, char *argv[])
 	}
 
 
+	// out_txt_file.open("/home/fac/High-Precision-Congestion-Control-master/simulation/src/point-to-point/model/note/switch2_nic1.txt", std::ios::out);
+	// out_txt_file<<"输出信息"<<std::endl;
+
 	bool dynamicth = use_dynamic_pfc_threshold;
 
 	Config::SetDefault("ns3::QbbNetDevice::PauseTime", UintegerValue(pause_time));
@@ -1023,6 +1034,7 @@ int main(int argc, char *argv[])
 			Ptr<SwitchNode> sw = DynamicCast<SwitchNode>(n.Get(i));
 			sw->SetAttribute("CcMode", UintegerValue(cc_mode));
 			sw->SetAttribute("MaxRtt", UintegerValue(maxRtt));
+			sw->SetAttribute("AckHighPrio", UintegerValue(1));
 		}
 	}
 

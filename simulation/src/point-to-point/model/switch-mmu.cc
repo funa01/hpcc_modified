@@ -97,6 +97,7 @@ namespace ns3 {
 		return used > reserve ? used - reserve : 0;
 	}
 	bool SwitchMmu::ShouldSendCN(uint32_t ifindex, uint32_t qIndex){
+		// std::cout<<ifindex<<"kmin"<<kmin[ifindex]<<std::endl;
 		if (qIndex == 0)
 			return false;
 		if (egress_bytes[ifindex][qIndex] > kmax[ifindex])

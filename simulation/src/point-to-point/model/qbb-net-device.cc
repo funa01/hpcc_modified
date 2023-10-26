@@ -231,7 +231,6 @@ namespace ns3 {
 
 	QbbNetDevice::QbbNetDevice()
 	{
-		out_txt_file.open("/home/fac/High-Precision-Congestion-Control-master/simulation/src/point-to-point/model/note/switch2_nic1.txt", std::ios::out);
 		NS_LOG_FUNCTION(this);
 		m_ecn_source = new std::vector<ECNAccount>;
 		for (uint32_t i = 0; i < qCnt; i++){
@@ -297,9 +296,18 @@ namespace ns3 {
 				Ptr<RdmaQueuePair> lastQp = m_rdmaEQ->GetQp(qIndex);
 				p = m_rdmaEQ->DequeueQindex(qIndex);
 
-				// if(m_node->GetId() == 6){
+				// if(m_node->GetId() == 5){//打印发送速率
 				// 	std::cout<<lastQp->m_rate<<std::endl;
 				// }
+
+
+
+			// 	if(m_node->GetId() == 5){
+			// 		for(int i=0;i<qCnt ;i++){//打印发送暂停
+			// 			std::cout<<m_paused[i]<<" ";
+			// 		}
+			// 		std::cout<<std::endl;
+			// }
 
 				// transmit
 				m_traceQpDequeue(p, lastQp);
@@ -324,7 +332,7 @@ namespace ns3 {
 		}else{   //switch, doesn't care about qcn, just send
 
 
-
+			out_txt_file.open("/home/fac/High-Precision-Congestion-Control-master/simulation/src/point-to-point/model/note/when_get_ecn", std::ios::out|std::ios::app);
 
 			// if(m_node->GetId() == 2  && m_ifIndex == 1){	//打印优先级队列
 			// 	std::cout<<"before ";
@@ -340,18 +348,29 @@ namespace ns3 {
 				
 			p = m_queue->DequeueRR(m_paused);		//this is round-robin
 
+
+
+
 			// if(m_node->GetId() == 2 && m_ifIndex == 1){	//打印取包后的优先级队列
 			// 	std::cout<<"after ";
-			// 	out_txt_file <<"取包发送之后";
+			// 	// out_txt_file <<"取包发送之后";
 			// 	// std::cout<<m_queue->m_bytesInQueue[i]<<"";
 			// 	for(int i=0;i<=qCnt ;i++){
 			// 		std::cout<<m_queue->GetNBytes(i)<<" ";
-			// 		out_txt_file<<m_queue->GetNBytes(i)<<" ";//打印优先级队列的包
+			// 		// out_txt_file<<m_queue->GetNBytes(i)<<" ";//打印优先级队列的包
+			// 	}
+			// 	if(p  != 0){
+			// 		std::cout<<"选中优先级为 "<<m_queue->GetLastQueue()<<" 的数据包";
+			// 	}else{
+			// 		std::cout<<"未选中数据包" ;
 			// 	}
 			// 	std::cout<<std::endl;
-			// 	std::cout<<std::endl;
-			// 	out_txt_file << std::endl;
-			// 	out_txt_file << std::endl;
+				
+			// 	// out_txt_file << std::endl;
+			// 	// out_txt_file << std::endl;
+			// 	if (p == 0){
+			// 		std::cout<<std::endl;
+			// 	}
 			// }
 
 			if (p != 0){
@@ -372,6 +391,12 @@ namespace ns3 {
 					m_node->SwitchNotifyDequeue(m_ifIndex, qIndex, p);
 					p->RemovePacketTag(t);
 				}
+
+				// if(m_node->GetId() == 2  && m_ifIndex == 1){
+				// 	out_txt_file.open("/home/fac/High-Precision-Congestion-Control-master/simulation/src/point-to-point/model/note/when_get_ecn", std::ios::out|std::ios::app);
+				// 	std::cout<<std::endl;
+				// }
+				
 				m_traceDequeue(p, qIndex);
 				TransmitStart(p);
 				return;
@@ -402,6 +427,8 @@ namespace ns3 {
 		m_paused[qIndex] = false;
 		NS_LOG_INFO("Node " << m_node->GetId() << " dev " << m_ifIndex << " queue " << qIndex <<
 			" resumed at " << Simulator::Now().GetSeconds());
+
+		std::cout<<"节点"<<m_node->GetId()<<" "<<"interface"<<m_ifIndex<<" "<<"优先级队列"<<qIndex<<" "<<"at time"<<Simulator::Now().GetSeconds ()<<"被恢复"<<std::endl;
 		DequeueAndTransmit();
 	}
 
@@ -434,6 +461,7 @@ namespace ns3 {
 			if (ch.pfc.time > 0){
 				m_tracePfc(1);
 				m_paused[qIndex] = true;
+				std::cout<<"节点"<<m_node->GetId()<<" "<<"interface"<<m_ifIndex<<" "<<"优先级队列"<<qIndex<<" "<<"at time"<<Simulator::Now().GetSeconds ()<<"被暂停"<<std::endl;
 			}else{
 				m_tracePfc(0);
 				Resume(qIndex);
@@ -508,8 +536,9 @@ namespace ns3 {
 		m_currentPkt = p;
 		m_phyTxBeginTrace(m_currentPkt);
 		Time txTime = Seconds(m_bps.CalculateTxTime(p->GetSize()));
-		// if(m_node->GetId() == 5 && m_ifIndex == 1){
-		// 	out_txt_file<<m_bps.GetBitRate()<<" "<<std::endl;
+		
+		// if(m_node->GetId() == 3){//打印发送速率
+		// 	std::cout<<m_bps<<" "<<std::endl;
 		// }
 		Time txCompleteTime = txTime + m_tInterframeGap;
 		NS_LOG_LOGIC("Schedule TransmitCompleteEvent in " << txCompleteTime.GetSeconds() << "sec");

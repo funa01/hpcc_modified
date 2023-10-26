@@ -7,11 +7,17 @@
 #include "switch-mmu.h"
 #include "pint.h"
 
+#include <fstream>
+#include <iomanip>
+
 namespace ns3 {
 
 class Packet;
 
 class SwitchNode : public Node{
+
+	std::ofstream out_txt_file,out_txt_file_ecn;
+
 	static const uint32_t pCnt = 257;	// Number of ports used
 	static const uint32_t qCnt = 8;	// Number of queues/priorities used
 	uint32_t m_ecmpSeed;

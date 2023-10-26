@@ -8,6 +8,10 @@
 #include "qbb-net-device.h"
 #include <unordered_map>
 #include "pint.h"
+#include <ns3/data-rate.h>
+
+#include <fstream>
+#include <iomanip>
 
 
 
@@ -26,6 +30,8 @@ struct RdmaInterfaceMgr{
 class RdmaHw : public Object {
 public:
 
+	std::ofstream out_txt_file,out_txt_file_rate_change;
+
 	static TypeId GetTypeId (void);
 	RdmaHw();
 
@@ -36,6 +42,7 @@ public:
 	uint32_t round_count; //处于的轮次 OR 计算处于的轮次 
 	uint32_t receive_count;//收到数据轮数
 	uint32_t send_count;
+	uint64_t m_rate_last;//上次的速率
 
 	Time compute_start_time;//计算的开始时间
 	double compute_time;	//计算的时间

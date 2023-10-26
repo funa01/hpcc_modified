@@ -184,6 +184,8 @@ TypeId RdmaHw::GetTypeId (void)
 
 RdmaHw::RdmaHw(){
 	GPU_waiting_count = 0;
+	out_txt_file.open("/home/fac/High-Precision-Congestion-Control-master/simulation/src/point-to-point/model/note/switch2_nic1.txt", std::ios::out|std::ios::app);
+	out_txt_file_rate_change.open("/home/fac/High-Precision-Congestion-Control-master/simulation/src/point-to-point/model/note/rate_change", std::ios::out|std::ios::trunc);
 }
 
 void RdmaHw::SetNode(Ptr<Node> node){
@@ -244,6 +246,8 @@ bool RdmaHw::GPU_Calculate(){
 	
 	
 	Simulator::Schedule(GPU_Calculate_time() , &RdmaHw::m_create_new_app_after_compute ,this, m_node , m_nextnode);
+	// out_txt_file<<m_node->GetId()<<" ";
+	// out_txt_file<<"start compute"<<" "<<"轮次为"<<total_node_number - round_count + 1<<" "<<"at time"<<" "<<Simulator::Now().GetSeconds ()<<"s"<<std::endl;
 	std::cout<<m_node->GetId()<<" ";
 	std::cout<<"start compute"<<" "<<"轮次为"<<total_node_number - round_count + 1<<" "<<"at time"<<" "<<Simulator::Now().GetSeconds ()<<"s"<<std::endl;
 }
@@ -271,6 +275,11 @@ Ptr<RdmaQueuePair> RdmaHw::GetQp(uint32_t dip, uint16_t sport, uint16_t pg){
 	return NULL;
 }
 void RdmaHw::AddQueuePair(uint64_t size, uint16_t pg, Ipv4Address sip, Ipv4Address dip, uint16_t sport, uint16_t dport, uint32_t win, uint64_t baseRtt, Callback<void> notifyAppFinish){
+	// if(m_node->GetId() == 5){// 打印ip
+	//  	std::cout<<sip.Get()<<std::endl;
+	//  }
+	
+	
 	// create qp
 	Ptr<RdmaQueuePair> qp = CreateObject<RdmaQueuePair>(pg, sip, dip, sport, dport);
 	qp->SetSize(size);
@@ -397,14 +406,19 @@ int RdmaHw::ReceiveUdp(Ptr<Packet> p, CustomHeader &ch){
 		m_nic[nic_idx].dev->RdmaEnqueueHighPrioQ(newp);
 		m_nic[nic_idx].dev->TriggerTransmit();
 	}
-	if(p->getifLast() == true && m_node->GetId()==3){
-		std::cout<<"last!"<<std::endl;
+	if(p->getifLast() == true && m_node->GetId()==3){//打印是否是最后一个数据包
+		// std::cout<<"last!"<<std::endl;
 		// Simulator::Stop();
 	}
 
 
 	if(x == 1 && p->getifLast() == true && receive_count > 1){
-		std::cout<<m_node->GetId()<<" ";
+		// out_txt_file<<m_node->GetId()<<" ";
+		// out_txt_file<<"成功接收所有"<<" "<<"轮次为"<<total_node_number - receive_count + 1<<" "<<"的数据包"<<"at time"<<" "<<Simulator::Now().GetSeconds ()<<"s"<<std::endl;
+
+
+
+		std::cout<<"节点"<<m_node->GetId()<<" ";
 		std::cout<<"成功接收所有"<<" "<<"轮次为"<<total_node_number - receive_count + 1<<" "<<"的数据包"<<"at time"<<" "<<Simulator::Now().GetSeconds ()<<"s"<<std::endl;
 		// std::cout<<"node."<<m_node->GetId()<<" "<<"在第"<<total_node_number - receive_count + 1<<"轮，用时"<<Simulator::Now().GetSeconds ()<<std::endl;
 		receive_count--;
@@ -490,7 +504,11 @@ int RdmaHw::ReceiveAck(Ptr<Packet> p, CustomHeader &ch){
 			qp->Acknowledge(goback_seq);
 		}
 		if (qp->IsFinished()){
-			std::cout<<m_node->GetId()<<" ";
+
+			// out_txt_file<<m_node->GetId()<<" ";
+			// out_txt_file<<"发送轮次为"<<total_node_number - send_count + 1<<" "<<"的数据包"<<"用时"<<" "<<m_nextnode->GetObject<RdmaDriver>()->m_rdma->receivetime.GetSeconds() - sendtime.GetSeconds() <<"s"<<std::endl;
+
+			std::cout<<"节点"<<m_node->GetId()<<" ";
 			std::cout<<"发送轮次为"<<total_node_number - send_count + 1<<" "<<"的数据包"<<"用时"<<" "<<m_nextnode->GetObject<RdmaDriver>()->m_rdma->receivetime.GetSeconds() - sendtime.GetSeconds() <<"s"<<std::endl;
 			send_count--;
 			QpComplete(qp);
@@ -504,6 +522,10 @@ int RdmaHw::ReceiveAck(Ptr<Packet> p, CustomHeader &ch){
 		if (m_cc_mode == 1){ // mlx version
 			cnp_received_mlx(qp);
 		} 
+
+		// if(m_node->GetId() == 5){//是否有cnp
+		// 	std::cout<<"cnp"<<" ";
+		// }
 	}
 
 	if (m_cc_mode == 3){
@@ -643,7 +665,7 @@ Ptr<Packet> RdmaHw::GetNxtPacket(Ptr<RdmaQueuePair> qp){
 	if(bytesLeft <= m_mtu){
 		p->setifLast(true);
 		if(m_node->GetId()==6){
-			std::cout<<"node."<<m_node->GetId()<<" "<<"at time"<<Simulator::Now()<<" "<<"发送到3最后一个数据包"<<std::endl;
+			std::cout<<"node."<<m_node->GetId()<<" "<<"at time"<<Simulator::Now().GetSeconds ()<<"s"<<" "<<"发送到3最后一个数据包"<<std::endl;
 		}
 	}else{
 		p->setifLast(false);
@@ -695,6 +717,16 @@ void RdmaHw::UpdateNextAvail(Ptr<RdmaQueuePair> qp, Time interframeGap, uint32_t
 	else
 		sendingTime = interframeGap + Seconds(qp->m_max_rate.CalculateTxTime(pkt_size));
 	qp->m_nextAvail = Simulator::Now() + sendingTime;
+	if(m_node->GetNodeType() == 0){
+		if(m_rate_last != qp->m_rate.GetBitRate()){//打印速率改变
+			// out_txt_file_rate_change<<"节点"<<m_node->GetId()<<"由速率"<<m_rate_last<<"bps"<<"变为速率"<<qp->m_rate.GetBitRate()<<"at time"<<" "<<Simulator::Now().GetSeconds ()<<"s"<<std::endl;
+			// std::cout<<"节点"<<m_node->GetId()<<"由速率"<<m_rate_last<<"bps"<<"变为速率"<<qp->m_rate.GetBitRate()<<std::endl;
+			// out_txt_file_rate_change.flush();
+			m_rate_last = qp->m_rate.GetBitRate();
+			// std::cout<<" "<<m_rate_last<<" "<<qp->m_rate.GetBitRate()<<std::endl;
+		}
+	}
+
 }
 
 void RdmaHw::ChangeRate(Ptr<RdmaQueuePair> qp, DataRate new_rate){
