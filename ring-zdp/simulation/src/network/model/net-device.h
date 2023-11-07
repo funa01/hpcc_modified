@@ -81,6 +81,7 @@ public:
   //Yibo: optimize
   virtual uint32_t GetUsedBuffer(uint32_t port, uint32_t qIndex);
 
+  uint32_t min_tag = 100;
 
   virtual ~NetDevice();
 

@@ -74,9 +74,9 @@ Node::Node()
 	Construct ();
 }
 void
-Node::setComT(uint32_t t)
+Node::setComT(double s)
 {
-  computetime = t;
+  computetime = s;
 }
 void
 Node::setPri(uint32_t pri)

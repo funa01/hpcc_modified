@@ -45,17 +45,24 @@
 #define N 4
 #define USE false
 #define USE_SEND false
-#define COMPUTE 9
-#define PRINT_Detail 0
+#define PRINT_Detail 1
 
 using namespace ns3;
 using namespace std;
 
 NS_LOG_COMPONENT_DEFINE("GENERIC_SIMULATION");
 
-vector<int> nums = {14, 14, 12,9}; // 计算延迟队列
+Time s_cmptime = Time(42000000);
+vector<int>
+	nums = {
+		67000,
+		42000,
+		26600,
+		26600,
+
+};								 // 计算延迟队列
 uint8_t calculate_num = 4;		 // 设置的参数服务器运算次数
-int64_t last_finish_time = 0;
+Time last_finish_time = Time(0);
 uint32_t tag = N;
 uint32_t m_tag = 0;
 bool sending = false;
@@ -316,38 +323,38 @@ void qp_finish(FILE *fout, Ptr<RdmaQueuePair> q)
 	Ptr<RdmaDriver> rdma = dstNode->GetObject<RdmaDriver>();
 	rdma->m_rdma->DeleteRxQp(q->sip.Get(), q->m_pg, q->sport);
 	
-		if (n.Get(did)->GetId() == 0)
+	if (n.Get(did)->GetId() == 0)
+	{
+		if (!sending)
+
 		{
-			if (!sending)
-				
-				{
-					Ptr<Node> serNode = n.Get(did);
-					serNode = n.Get(did);
-					serNode->setComT(COMPUTE);
-					m_tag++;
-					// printf("parameter recive m_tag: %d tag:%d\n",m_tag,tag);
+			Ptr<Node> serNode = n.Get(did);
+			serNode = n.Get(did);
+
+			m_tag++;
+			// printf("parameter recive m_tag: %d tag:%d\n",m_tag,tag);
 					
 					#if PRINT_Detail
-					printf("server: receive date ******* at time:%lu us from node: %d\n", Simulator::Now().GetTimeStep(), n.Get(sid)->GetId());
+					printf("server: receive date ******* at time:%f s from node: %d\n", Simulator::Now().GetSeconds(), n.Get(sid)->GetId());
 					#endif
 
 					if (m_tag == tag)
 					{
-
+						Time sendTime = Simulator::Now() + s_cmptime;
 						sending = true;
 						printf("*********************************\n");
-						printf("server receive all data and begin compute at time: %lu us \n", Simulator::Now().GetTimeStep());
-						serNode->gpuAvai = Simulator::Now().GetTimeStep() + serNode->computetime;
-						printf("compute finish at time: %lu \n", serNode->gpuAvai);
-						printf("using time of this round: %lu us\n", serNode->gpuAvai - last_finish_time);
-						last_finish_time = serNode->gpuAvai;
+						printf("server receive all data and begin compute at time: %f s \n", Simulator::Now().GetSeconds());
+						serNode->gpuAvai = sendTime.GetTimeStep();
+						printf("compute finish at time: %f s\n", (sendTime).GetSeconds());
+						printf("using time of this round: %f s\n", (sendTime - last_finish_time).GetSeconds());
+						last_finish_time = sendTime;
 						printf("*********************************\n");
 						for (int i = 0; i < N; i++)
 						{
 
 							send(q, 0, wating_send[i]->GetId(), serNode->gpuAvai - Simulator::Now().GetTimeStep()); // 参数服务器的运算时间为
 							#if PRINT_Detail
-							printf("server send to %u node  *****  time: %lu us \n", wating_send[i]->GetId(), Simulator::Now().GetTimeStep());
+							printf("server send to %u node  *****  time: %f s \n", wating_send[i]->GetId(), Simulator::Now().GetSeconds());
 							# endif
 							m_tag--;
 						}
@@ -358,7 +365,7 @@ void qp_finish(FILE *fout, Ptr<RdmaQueuePair> q)
 			{
 				Ptr<Node> serNode = n.Get(did);
 				serNode = n.Get(did);
-				serNode->setComT(COMPUTE);
+				
 				m_tag++;
 				#if PRINT_Detail
 				printf("receve next turn data from node: %d \n", n.Get(sid)->GetId());
@@ -374,7 +381,7 @@ void qp_finish(FILE *fout, Ptr<RdmaQueuePair> q)
 
 			send(q, n.Get(did)->GetId(), 0, n.Get(did)->computetime);
 			#if PRINT_Detail
-			printf("server sending using time: %lu us *** work receive time: %lu us *** send time: %lu us *** work node: %d \n", (Simulator::Now() - q->startTime).GetTimeStep(), Simulator::Now().GetTimeStep(), Simulator::Now().GetTimeStep() + n.Get(did)->computetime, n.Get(did)->GetId());
+			printf("server sending using time: %f s *** work receive time: %f s *** send time: %f s *** work node: %d \n", (Simulator::Now() - q->startTime).GetSeconds(), Simulator::Now().GetSeconds(),Time(Simulator::Now().GetTimeStep() + n.Get(did)->computetime).GetSeconds(), n.Get(did)->GetId());
 			#endif
 		}
 	
@@ -1050,22 +1057,29 @@ int main(int argc, char *argv[])
 			n.Get(i)->gpuAvai = 0;
 		}
 	}
-	n.Get(0)->setComT(COMPUTE);
+	
 	if (USE)
 	{
 		int ori_arr[N] = {0};
 		priority(nums, ori_arr);
 		for (int i =0 ; i < N; i++)
 		{
+
+			ori_arr[i] = ori_arr[i] * 1000;
 			wating_send[i]->setComT(ori_arr[i]);
-			printf("init node %u, compute time: %lu us\n", wating_send[i]->GetId(), wating_send[i]->computetime);
+			Time cm = Time(ori_arr[i]);
+
+			printf("init node %u, compute time: %f s\n", wating_send[i]->GetId(), cm.GetSeconds());
 		}
 	}
 	else
 	{
 		for (int i = 0; i < wating_send.size(); i++)
 		{
+			nums[i] = nums[i] * 1000;
 			wating_send[i]->setComT(nums[i]);
+			Time cm = Time(nums[i]);
+			printf("compute time : %f s \n", cm.GetSeconds());
 		}
 	}
 	NS_LOG_INFO("Create channels.");

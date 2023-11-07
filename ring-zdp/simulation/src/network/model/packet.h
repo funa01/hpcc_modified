@@ -228,6 +228,7 @@ public:
    * by getUid).
    */
   Packet ();
+  uint32_t m_tag;
   Packet (const Packet &o);
   Packet &operator = (const Packet &o);
   /**

@@ -72,6 +72,7 @@ class QbbNetDevice : public PointToPointNetDevice
 {
 public:
   static const uint32_t qCnt = 8;	// Number of queues/priorities used
+  uint32_t min_tag = 100;
 
   static TypeId GetTypeId (void);
 

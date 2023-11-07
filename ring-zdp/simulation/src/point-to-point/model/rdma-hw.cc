@@ -591,14 +591,15 @@ Ptr<Packet> RdmaHw::GetNxtPacket(Ptr<RdmaQueuePair> qp){
 	// update state
 	qp->snd_nxt += payload_size;
 	qp->m_ipid++;
-
+	p->m_tag = qp->m_tg;
 	// return
 	return p;
 }
 
 void RdmaHw::PktSent(Ptr<RdmaQueuePair> qp, Ptr<Packet> pkt, Time interframeGap){
 	qp->lastPktSize = pkt->GetSize();
-	//printf("pkt send at %d in node of %d\n", Simulator::Now(), m_node->GetId());
+	//printf("send rate: %u to node: %u\n", qp->m_rate.GetBitRate(), (qp->dip.Get() >> 8) & 0xffff);
+
 	UpdateNextAvail(qp, interframeGap, pkt->GetSize());
 }
 

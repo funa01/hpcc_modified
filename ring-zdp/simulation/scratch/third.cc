@@ -41,12 +41,12 @@
 using namespace ns3;
 using namespace std;
 
-vector<uint32_t> nums = {3000000, 3000000, 5000000, 6000000}; //计算延迟队列
+vector<double> nums = {0.0266,0.0266,0.042,0.042}; // 计算延迟队列单位s
 vector<Ptr<Node>> nodes;
 vector<uint32_t> pri;
 NS_LOG_COMPONENT_DEFINE("GENERIC_SIMULATION");
 
-uint32_t tag = 4;
+uint32_t tag = 4; //标识符，可修改
 uint32_t cc_mode = 1;
 bool enable_qcn = true, use_dynamic_pfc_threshold = true;
 uint32_t packet_payload_size = 1000, l2_chunk_size = 0, l2_ack_interval = 0;
@@ -186,7 +186,8 @@ void qp_finish(FILE* fout, Ptr<RdmaQueuePair> q){
 	// sip, dip, sport, dport, size (B), start_time, fct (ns), standalone_fct (ns)
 	fprintf(fout, "%08x %08x %u %u %lu %lu %lu %lu\n", q->sip.Get(), q->dip.Get(), q->sport, q->dport, q->m_size, q->startTime.GetTimeStep(), (Simulator::Now() - q->startTime).GetTimeStep(), standalone_fct);
 	fflush(fout);
-	
+
+	printf("using time: %u, des node: %u\n", Simulator::Now().GetTimeStep() - q->startTime.GetTimeStep(), did);
 
 	// remove rxQp from the receiver
 	Ptr<Node> dstNode = n.Get(did);
@@ -196,34 +197,35 @@ void qp_finish(FILE* fout, Ptr<RdmaQueuePair> q){
 	uint32_t src = did;
 	Ptr<Node> next_node = dstNode->next_node;
 	uint32_t dst = next_node->GetId();
-	int send_time;
+	Time send_time;
 	
 		if(q->m_tg!=1)
 		{
 			q->m_tg--;
 
-
+			Time gpuAvai = Seconds(dstNode->gpuAvai);
+			Time computetime = Seconds(dstNode->computetime);
 			printf("********************************************\n");
-			if(Simulator::Now().GetTimeStep()<dstNode->gpuAvai)
+			if(Simulator::Now()<gpuAvai)
 			{
 				printf("wating Gpu\n");
-				send_time = dstNode->gpuAvai + dstNode->computetime;
+				send_time =gpuAvai + computetime;
 			}
 			else
 			{
 				printf("compute directly\n");
-				send_time = dstNode->computetime + Simulator::Now().GetTimeStep();
+				send_time = computetime + Simulator::Now();
 			}
 			q->m_pg = n.Get(src)->m_pri;
-			send(q, src, dst, send_time - Simulator::Now().GetTimeStep());
+			send(q, src, dst, (send_time - Simulator::Now()).GetTimeStep());
 
-			dstNode->gpuAvai = send_time;
-			printf("last sending using time: %lu us *** receive time: %lu us *** send time: %lu us *** node: %d *** tag: %d\n", (Simulator::Now() - q->startTime).GetTimeStep(), Simulator::Now().GetTimeStep(), send_time , n.Get(src)->GetId(), q->m_tg);
+			dstNode->gpuAvai = send_time.GetSeconds();
+			printf("last sending using time: %f s *** receive time: %f s *** send time: %f s *** node: %d *** tag: %d\n", (Simulator::Now() - q->startTime).GetSeconds(), Simulator::Now().GetSeconds(), send_time.GetSeconds() , n.Get(src)->GetId(), q->m_tg);
 			}
 		else
 		{
 			printf("********************************************************************\n ");
-			printf("task finish time: %lu  node: %lu\n", Simulator::Now().GetTimeStep(), n.Get(src)->GetId());
+			printf("task finish time: %f  node: %lu\n", Simulator::Now().GetSeconds(), n.Get(src)->GetId());
 		}
 		
 }
@@ -793,6 +795,7 @@ int main(int argc, char *argv[])
 	for (uint32_t i = 0; i < nodes.size();i++)
 	{
 		nodes[i]->setComT(nums[i]);
+		printf("seconds: %f, time step: %lu \n", nums[i], Seconds(nums[i]).GetTimeStep());
 		nodes[i]->gpuAvai = 0;
 	}
 		NS_LOG_INFO("Create channels.");

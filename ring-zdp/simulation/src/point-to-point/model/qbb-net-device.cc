@@ -100,10 +100,10 @@ namespace ns3 {
 		int res = -1024;
 		uint32_t fcount = m_qpGrp->GetN();
 		uint32_t min_finish_id = 0xffffffff;
-		//m_rrlast = 0;//每轮先选择最高
-		for (qIndex = 1; qIndex <= fcount; qIndex++)
+		m_rrlast = 0;//每轮先选择最高
+		for (qIndex = 0; qIndex < fcount; qIndex++)
 		{
-
+			
 			uint32_t idx = (qIndex + m_rrlast) % fcount;
 			Ptr<RdmaQueuePair> qp = m_qpGrp->Get(idx);
 			if (!paused[qp->m_pg] && qp->GetBytesLeft() > 0 && !qp->IsWinBound()){
@@ -114,6 +114,8 @@ namespace ns3 {
 			}else if (qp->IsFinished()){
 				min_finish_id = idx < min_finish_id ? idx : min_finish_id;
 			}
+
+
 		}
 
 		// clear the finished qp

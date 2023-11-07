@@ -76,7 +76,7 @@ Node::Node()
 void
 Node::setComT(int t)
 {
-  computetime = t * 100000;
+  computetime = t;
 }
 Node::Node(uint32_t sid)
   : m_id (0),

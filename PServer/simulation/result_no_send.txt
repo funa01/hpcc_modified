@@ -1,0 +1,65 @@
+ENABLE_QCN                      Yes
+USE_DYNAMIC_PFC_THRESHOLD       Yes
+PACKET_PAYLOAD_SIZE             1000
+TOPOLOGY_FILE                   mix/topology.txt
+FLOW_FILE                       mix/flow.txt
+TRACE_FILE                      mix/trace.txt
+TRACE_OUTPUT_FILE               mix/mix.tr
+FCT_OUTPUT_FILE         mix/fct.txt
+PFC_OUTPUT_FILE                         mix/pfc.txt
+SIMULATOR_STOP_TIME             400
+CC_MODE         1
+ALPHA_RESUME_INTERVAL           1
+RATE_DECREASE_INTERVAL          4
+CLAMP_TARGET_RATE               No
+RP_TIMER                        900
+EWMA_GAIN                       0.00390625
+FAST_RECOVERY_TIMES             1
+RATE_AI                         50Mb/s
+RATE_HAI                        100Mb/s
+MIN_RATE                100Mb/s
+DCTCP_RATE_AI                           1000Mb/s
+ERROR_RATE_PER_LINK             0
+L2_CHUNK_SIZE                   4000
+L2_ACK_INTERVAL                 1
+L2_BACK_TO_ZERO                 No
+HAS_WIN         1
+GLOBAL_T                1
+VAR_WIN         1
+FAST_REACT              1
+U_TARGET                0.95
+MI_THRESH               0
+INT_MULTI                               1
+MULTI_RATE                              0
+SAMPLE_FEEDBACK                         0
+PINT_LOG_BASE                           1.05
+PINT_PROB                               1
+RATE_BOUND              1
+ACK_HIGH_PRIO           1
+LINK_DOWN                               0 0 0
+ENABLE_TRACE                            1
+KMAX_MAP                                 1000000000 400 50000000000 800 100000000000 1600
+KMIN_MAP                                 1000000000 100 50000000000 200 100000000000 400
+PMAX_MAP                                 1000000000 0.2 50000000000 0.2 100000000000 0.2
+BUFFER_SIZE                             32
+QLEN_MON_FILE                           mix/qlen.txt
+QLEN_MON_START                          2000000000
+QLEN_MON_END                            2010000000
+compute time : 0.026600 s 
+compute time : 0.026600 s 
+compute time : 0.042000 s 
+compute time : 0.067000 s 
+maxRtt=72800 maxBdp=9100
+Running Simulation.
+server sending using time: 19.572649 s *** work receive time: 19.572649 s *** send time: 19.599249 s *** work node: 4 
+server sending using time: 19.572657 s *** work receive time: 19.572657 s *** send time: 19.599257 s *** work node: 5 
+server sending using time: 19.572664 s *** work receive time: 19.572664 s *** send time: 19.614664 s *** work node: 6 
+server sending using time: 19.572672 s *** work receive time: 19.572672 s *** send time: 19.639672 s *** work node: 7 
+server: receive date ******* at time:39.148168 s from node: 4
+server: receive date ******* at time:39.148184 s from node: 5
+server: receive date ******* at time:39.163524 s from node: 6
+server: receive date ******* at time:39.171923 s from node: 7
+*********************************
+server receive all data and begin compute at time: 39.171923 s 
+compute finish at time: 39.213923 s
+using time of this round: 39.213923 s

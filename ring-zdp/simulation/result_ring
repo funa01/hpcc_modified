@@ -1,0 +1,66 @@
+Waf: Entering directory `/home/ubuntu/work_space/hpcc_modified/ring-zdp/simulation/build'
+[ 693/1425] cxx: scratch/third.cc -> build/scratch/third.cc.3.o
+../scratch/third.cc: In function ‘void qp_finish(FILE*, ns3::Ptr<ns3::RdmaQueuePair>)’:
+../scratch/third.cc:190:107: warning: format ‘%u’ expects argument of type ‘unsigned int’, but argument 2 has type ‘int64_t {aka long int}’ [-Wformat=]
+  printf("using time: %u, des node: %u\n", Simulator::Now().GetTimeStep() - q->startTime.GetTimeStep(), did);
+                                                                                                           ^
+../scratch/third.cc:228:98: warning: format ‘%lu’ expects argument of type ‘long unsigned int’, but argument 3 has type ‘uint32_t {aka unsigned int}’ [-Wformat=]
+    printf("task finish time: %f  node: %lu\n", Simulator::Now().GetSeconds(), n.Get(src)->GetId());
+                                                                                                  ^
+[1417/1425] cxxprogram: build/scratch/third.cc.3.o -> build/scratch/third
+Waf: Leaving directory `/home/ubuntu/work_space/hpcc_modified/ring-zdp/simulation/build'
+'build' finished successfully (6.117s)
+ENABLE_QCN			Yes
+USE_DYNAMIC_PFC_THRESHOLD	Yes
+PACKET_PAYLOAD_SIZE		1000
+TOPOLOGY_FILE			mix/topology.txt
+FLOW_FILE			mix/flow.txt
+TRACE_FILE			mix/trace.txt
+TRACE_OUTPUT_FILE		mix/mix.tr
+FCT_OUTPUT_FILE		mix/fct.txt
+PFC_OUTPUT_FILE				mix/pfc.txt
+SIMULATOR_STOP_TIME		4
+CC_MODE		1
+ALPHA_RESUME_INTERVAL		1
+RATE_DECREASE_INTERVAL		4
+CLAMP_TARGET_RATE		No
+RP_TIMER			900
+EWMA_GAIN			0.00390625
+FAST_RECOVERY_TIMES		1
+RATE_AI				50Mb/s
+RATE_HAI			100Mb/s
+MIN_RATE		100Mb/s
+DCTCP_RATE_AI				1000Mb/s
+ERROR_RATE_PER_LINK		0
+L2_CHUNK_SIZE			1000
+L2_ACK_INTERVAL			1
+L2_BACK_TO_ZERO			No
+HAS_WIN		1
+GLOBAL_T		1
+VAR_WIN		0
+FAST_REACT		1
+U_TARGET		0.95
+MI_THRESH		0
+INT_MULTI				1
+MULTI_RATE				0
+SAMPLE_FEEDBACK				0
+PINT_LOG_BASE				1.05
+PINT_PROB				1
+RATE_BOUND		1
+ACK_HIGH_PRIO		0
+LINK_DOWN				0 0 0
+ENABLE_TRACE				1
+KMAX_MAP				 1000000000 400 50000000000 800 100000000000 1600
+KMIN_MAP				 1000000000 80 50000000000 400 100000000000 400
+PMAX_MAP				 1000000000 0.2 50000000000 0.2 100000000000 0.2
+BUFFER_SIZE				64
+QLEN_MON_FILE				mix/qlen.txt
+QLEN_MON_START				2000000000
+QLEN_MON_END				2010000000
+seconds: 0.026600, time step: 26599999 
+seconds: 0.026600, time step: 26599999 
+seconds: 0.042000, time step: 42000000 
+seconds: 0.042000, time step: 42000000 
+maxRtt=72800 maxBdp=9100
+Running Simulation.
+81.2511

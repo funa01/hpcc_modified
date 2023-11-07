@@ -1,0 +1,317 @@
+Waf: Entering directory `/home/ubuntu/work_space/hpcc_modified/PServer/simulation/build'
+Waf: Leaving directory `/home/ubuntu/work_space/hpcc_modified/PServer/simulation/build'
+'build' finished successfully (0.916s)
+ENABLE_QCN			Yes
+USE_DYNAMIC_PFC_THRESHOLD	Yes
+PACKET_PAYLOAD_SIZE		1000
+TOPOLOGY_FILE			mix/topology.txt
+FLOW_FILE			mix/flow.txt
+TRACE_FILE			mix/trace.txt
+TRACE_OUTPUT_FILE		mix/mix.tr
+FCT_OUTPUT_FILE		mix/fct.txt
+PFC_OUTPUT_FILE				mix/pfc.txt
+pCC_MODE		1
+ALPHA_RESUME_INTERVAL		1
+RATE_DECREASE_INTERVAL		4
+CLAMP_TARGET_RATE		No
+RP_TIMER			900
+EWMA_GAIN			0.00390625
+FAST_RECOVERY_TIMES		1
+RATE_AI				50Mb/s
+RATE_HAI			100Mb/s
+MIN_RATE		100Mb/s
+DCTCP_RATE_AI				1000Mb/s
+ERROR_RATE_PER_LINK		0
+L2_CHUNK_SIZE			4000
+L2_ACK_INTERVAL			1
+L2_BACK_TO_ZERO			No
+HAS_WIN		1
+GLOBAL_T		1
+VAR_WIN		1
+FAST_REACT		1
+U_TARGET		0.95
+MI_THRESH		0
+INT_MULTI				1
+MULTI_RATE				0
+SAMPLE_FEEDBACK				0
+PINT_LOG_BASE				1.05
+PINT_PROB				1
+RATE_BOUND		1
+ACK_HIGH_PRIO		1
+LINK_DOWN				0 0 0
+ENABLE_TRACE				1
+KMAX_MAP				 1000000000 400 50000000000 800 100000000000 1600
+KMIN_MAP				 1000000000 100 50000000000 200 100000000000 400
+PMAX_MAP				 1000000000 0.2 50000000000 0.2 100000000000 0.2
+BUFFER_SIZE				32
+QLEN_MON_FILE				mix/qlen.txt
+QLEN_MON_START				2000000000
+QLEN_MON_END				2010000000
+ Priority order 67000 26600 26600 42000 
+init node 4, compute time: 0.067000 s
+init node 5, compute time: 0.026600 s
+init node 6, compute time: 0.026600 s
+init node 7, compute time: 0.042000 s
+maxRtt=72800 maxBdp=9100
+Running Simulation.
+server sending using time: 4.893205 s *** work receive time: 4.893205 s *** send time: 4.960205 s *** work node: 4 
+server sending using time: 10.062135 s *** work receive time: 10.062135 s *** send time: 10.088735 s *** work node: 5 
+server: receive date ******* at time:10.133010 s from node: 4
+server sending using time: 15.234875 s *** work receive time: 15.234875 s *** send time: 15.261475 s *** work node: 6 
+server: receive date ******* at time:15.305759 s from node: 5
+server sending using time: 20.407623 s *** work receive time: 20.407623 s *** send time: 20.449623 s *** work node: 7 
+server: receive date ******* at time:20.474670 s from node: 6
+server: receive date ******* at time:25.367826 s from node: 7
+*********************************
+server receive all data and begin compute at time: 25.367826 s 
+compute finish at time: 25.409826 s
+using time of this round: 25.409826 s
+*********************************
+server send to 4 node  *****  time: 25.367826 s 
+server send to 5 node  *****  time: 25.367826 s 
+server send to 6 node  *****  time: 25.367826 s 
+server send to 7 node  *****  time: 25.367826 s 
+server sending using time: 4.893205 s *** work receive time: 30.303031 s *** send time: 30.370031 s *** work node: 4 
+server sending using time: 10.062135 s *** work receive time: 35.471961 s *** send time: 35.498561 s *** work node: 5 
+server: receive date ******* at time:35.587031 s from node: 4
+server sending using time: 15.234875 s *** work receive time: 40.644701 s *** send time: 40.671301 s *** work node: 6 
+server: receive date ******* at time:40.759779 s from node: 5
+server sending using time: 20.407623 s *** work receive time: 45.817449 s *** send time: 45.859449 s *** work node: 7 
+server: receive date ******* at time:45.909477 s from node: 6
+server: receive date ******* at time:50.777652 s from node: 7
+*********************************
+server receive all data and begin compute at time: 50.777652 s 
+compute finish at time: 50.819652 s
+using time of this round: 25.409826 s
+*********************************
+server send to 4 node  *****  time: 50.777652 s 
+server send to 5 node  *****  time: 50.777652 s 
+server send to 6 node  *****  time: 50.777652 s 
+server send to 7 node  *****  time: 50.777652 s 
+server sending using time: 4.893205 s *** work receive time: 55.712856 s *** send time: 55.779856 s *** work node: 4 
+server sending using time: 10.062135 s *** work receive time: 60.881786 s *** send time: 60.908386 s *** work node: 5 
+server: receive date ******* at time:60.996856 s from node: 4
+server sending using time: 15.234875 s *** work receive time: 66.054526 s *** send time: 66.081126 s *** work node: 6 
+server: receive date ******* at time:66.169605 s from node: 5
+server sending using time: 20.407623 s *** work receive time: 71.227275 s *** send time: 71.269275 s *** work node: 7 
+server: receive date ******* at time:71.319302 s from node: 6
+server: receive date ******* at time:76.187477 s from node: 7
+*********************************
+server receive all data and begin compute at time: 76.187477 s 
+compute finish at time: 76.229477 s
+using time of this round: 25.409826 s
+*********************************
+server send to 4 node  *****  time: 76.187477 s 
+server send to 5 node  *****  time: 76.187477 s 
+server send to 6 node  *****  time: 76.187477 s 
+server send to 7 node  *****  time: 76.187477 s 
+server sending using time: 4.893205 s *** work receive time: 81.122682 s *** send time: 81.189682 s *** work node: 4 
+server sending using time: 10.062135 s *** work receive time: 86.291612 s *** send time: 86.318212 s *** work node: 5 
+server: receive date ******* at time:86.406682 s from node: 4
+server sending using time: 15.234875 s *** work receive time: 91.464352 s *** send time: 91.490952 s *** work node: 6 
+server: receive date ******* at time:91.579431 s from node: 5
+server sending using time: 20.407623 s *** work receive time: 96.637101 s *** send time: 96.679101 s *** work node: 7 
+server: receive date ******* at time:96.729128 s from node: 6
+server: receive date ******* at time:101.597303 s from node: 7
+*********************************
+server receive all data and begin compute at time: 101.597303 s 
+compute finish at time: 101.639303 s
+using time of this round: 25.409826 s
+*********************************
+server send to 4 node  *****  time: 101.597303 s 
+server send to 5 node  *****  time: 101.597303 s 
+server send to 6 node  *****  time: 101.597303 s 
+server send to 7 node  *****  time: 101.597303 s 
+server sending using time: 4.893205 s *** work receive time: 106.532508 s *** send time: 106.599508 s *** work node: 4 
+server sending using time: 10.062135 s *** work receive time: 111.701438 s *** send time: 111.728038 s *** work node: 5 
+server: receive date ******* at time:111.816508 s from node: 4
+server sending using time: 15.234875 s *** work receive time: 116.874178 s *** send time: 116.900778 s *** work node: 6 
+server: receive date ******* at time:116.989256 s from node: 5
+server sending using time: 20.407623 s *** work receive time: 122.046926 s *** send time: 122.088926 s *** work node: 7 
+server: receive date ******* at time:122.138954 s from node: 6
+server: receive date ******* at time:127.007129 s from node: 7
+*********************************
+server receive all data and begin compute at time: 127.007129 s 
+compute finish at time: 127.049129 s
+using time of this round: 25.409826 s
+*********************************
+server send to 4 node  *****  time: 127.007129 s 
+server send to 5 node  *****  time: 127.007129 s 
+server send to 6 node  *****  time: 127.007129 s 
+server send to 7 node  *****  time: 127.007129 s 
+server sending using time: 4.893205 s *** work receive time: 131.942334 s *** send time: 132.009334 s *** work node: 4 
+server sending using time: 10.062135 s *** work receive time: 137.111264 s *** send time: 137.137864 s *** work node: 5 
+server: receive date ******* at time:137.226334 s from node: 4
+server sending using time: 15.234875 s *** work receive time: 142.284004 s *** send time: 142.310604 s *** work node: 6 
+server: receive date ******* at time:142.399082 s from node: 5
+server sending using time: 20.407623 s *** work receive time: 147.456752 s *** send time: 147.498752 s *** work node: 7 
+server: receive date ******* at time:147.548780 s from node: 6
+server: receive date ******* at time:152.416955 s from node: 7
+*********************************
+server receive all data and begin compute at time: 152.416955 s 
+compute finish at time: 152.458955 s
+using time of this round: 25.409826 s
+*********************************
+server send to 4 node  *****  time: 152.416955 s 
+server send to 5 node  *****  time: 152.416955 s 
+server send to 6 node  *****  time: 152.416955 s 
+server send to 7 node  *****  time: 152.416955 s 
+server sending using time: 4.893205 s *** work receive time: 157.352160 s *** send time: 157.419160 s *** work node: 4 
+server sending using time: 10.062135 s *** work receive time: 162.521089 s *** send time: 162.547689 s *** work node: 5 
+server: receive date ******* at time:162.636159 s from node: 4
+server sending using time: 15.234875 s *** work receive time: 167.693829 s *** send time: 167.720429 s *** work node: 6 
+server: receive date ******* at time:167.808908 s from node: 5
+server sending using time: 20.407623 s *** work receive time: 172.866578 s *** send time: 172.908578 s *** work node: 7 
+server: receive date ******* at time:172.958605 s from node: 6
+server: receive date ******* at time:177.826780 s from node: 7
+*********************************
+server receive all data and begin compute at time: 177.826780 s 
+compute finish at time: 177.868780 s
+using time of this round: 25.409826 s
+*********************************
+server send to 4 node  *****  time: 177.826780 s 
+server send to 5 node  *****  time: 177.826780 s 
+server send to 6 node  *****  time: 177.826780 s 
+server send to 7 node  *****  time: 177.826780 s 
+server sending using time: 4.893205 s *** work receive time: 182.761985 s *** send time: 182.828985 s *** work node: 4 
+server sending using time: 10.062135 s *** work receive time: 187.930915 s *** send time: 187.957515 s *** work node: 5 
+server: receive date ******* at time:188.045985 s from node: 4
+server sending using time: 15.234875 s *** work receive time: 193.103655 s *** send time: 193.130255 s *** work node: 6 
+server: receive date ******* at time:193.218734 s from node: 5
+server sending using time: 20.407623 s *** work receive time: 198.276404 s *** send time: 198.318404 s *** work node: 7 
+server: receive date ******* at time:198.368431 s from node: 6
+server: receive date ******* at time:203.236606 s from node: 7
+*********************************
+server receive all data and begin compute at time: 203.236606 s 
+compute finish at time: 203.278606 s
+using time of this round: 25.409826 s
+*********************************
+server send to 4 node  *****  time: 203.236606 s 
+server send to 5 node  *****  time: 203.236606 s 
+server send to 6 node  *****  time: 203.236606 s 
+server send to 7 node  *****  time: 203.236606 s 
+server sending using time: 4.893205 s *** work receive time: 208.171811 s *** send time: 208.238811 s *** work node: 4 
+server sending using time: 10.062135 s *** work receive time: 213.340741 s *** send time: 213.367341 s *** work node: 5 
+server: receive date ******* at time:213.455811 s from node: 4
+server sending using time: 15.234875 s *** work receive time: 218.513481 s *** send time: 218.540081 s *** work node: 6 
+server: receive date ******* at time:218.628559 s from node: 5
+server sending using time: 20.407623 s *** work receive time: 223.686229 s *** send time: 223.728229 s *** work node: 7 
+server: receive date ******* at time:223.778257 s from node: 6
+server: receive date ******* at time:228.646432 s from node: 7
+*********************************
+server receive all data and begin compute at time: 228.646432 s 
+compute finish at time: 228.688432 s
+using time of this round: 25.409826 s
+*********************************
+server send to 4 node  *****  time: 228.646432 s 
+server send to 5 node  *****  time: 228.646432 s 
+server send to 6 node  *****  time: 228.646432 s 
+server send to 7 node  *****  time: 228.646432 s 
+server sending using time: 4.893205 s *** work receive time: 233.581637 s *** send time: 233.648637 s *** work node: 4 
+server sending using time: 10.062135 s *** work receive time: 238.750567 s *** send time: 238.777167 s *** work node: 5 
+server: receive date ******* at time:238.865637 s from node: 4
+server sending using time: 15.234875 s *** work receive time: 243.923307 s *** send time: 243.949907 s *** work node: 6 
+server: receive date ******* at time:244.038385 s from node: 5
+server sending using time: 20.407623 s *** work receive time: 249.096055 s *** send time: 249.138055 s *** work node: 7 
+server: receive date ******* at time:249.188083 s from node: 6
+server: receive date ******* at time:254.056258 s from node: 7
+*********************************
+server receive all data and begin compute at time: 254.056258 s 
+compute finish at time: 254.098258 s
+using time of this round: 25.409826 s
+*********************************
+server send to 4 node  *****  time: 254.056258 s 
+server send to 5 node  *****  time: 254.056258 s 
+server send to 6 node  *****  time: 254.056258 s 
+server send to 7 node  *****  time: 254.056258 s 
+server sending using time: 4.893205 s *** work receive time: 258.991463 s *** send time: 259.058463 s *** work node: 4 
+server sending using time: 10.062135 s *** work receive time: 264.160392 s *** send time: 264.186992 s *** work node: 5 
+server: receive date ******* at time:264.275462 s from node: 4
+server sending using time: 15.234875 s *** work receive time: 269.333132 s *** send time: 269.359732 s *** work node: 6 
+server: receive date ******* at time:269.448211 s from node: 5
+server sending using time: 20.407623 s *** work receive time: 274.505881 s *** send time: 274.547881 s *** work node: 7 
+server: receive date ******* at time:274.597909 s from node: 6
+server: receive date ******* at time:279.466083 s from node: 7
+*********************************
+server receive all data and begin compute at time: 279.466083 s 
+compute finish at time: 279.508083 s
+using time of this round: 25.409826 s
+*********************************
+server send to 4 node  *****  time: 279.466083 s 
+server send to 5 node  *****  time: 279.466083 s 
+server send to 6 node  *****  time: 279.466083 s 
+server send to 7 node  *****  time: 279.466083 s 
+server sending using time: 4.893205 s *** work receive time: 284.401288 s *** send time: 284.468288 s *** work node: 4 
+server sending using time: 10.062135 s *** work receive time: 289.570218 s *** send time: 289.596818 s *** work node: 5 
+server: receive date ******* at time:289.685288 s from node: 4
+server sending using time: 15.234875 s *** work receive time: 294.742958 s *** send time: 294.769558 s *** work node: 6 
+server: receive date ******* at time:294.858037 s from node: 5
+server sending using time: 20.407623 s *** work receive time: 299.915707 s *** send time: 299.957707 s *** work node: 7 
+server: receive date ******* at time:300.007734 s from node: 6
+server: receive date ******* at time:304.875909 s from node: 7
+*********************************
+server receive all data and begin compute at time: 304.875909 s 
+compute finish at time: 304.917909 s
+using time of this round: 25.409826 s
+*********************************
+server send to 4 node  *****  time: 304.875909 s 
+server send to 5 node  *****  time: 304.875909 s 
+server send to 6 node  *****  time: 304.875909 s 
+server send to 7 node  *****  time: 304.875909 s 
+server sending using time: 4.893205 s *** work receive time: 309.811114 s *** send time: 309.878114 s *** work node: 4 
+server sending using time: 10.062135 s *** work receive time: 314.980044 s *** send time: 315.006644 s *** work node: 5 
+server: receive date ******* at time:315.095114 s from node: 4
+server sending using time: 15.234875 s *** work receive time: 320.152784 s *** send time: 320.179384 s *** work node: 6 
+server: receive date ******* at time:320.267862 s from node: 5
+server sending using time: 20.407623 s *** work receive time: 325.325532 s *** send time: 325.367532 s *** work node: 7 
+server: receive date ******* at time:325.417560 s from node: 6
+server: receive date ******* at time:330.285735 s from node: 7
+*********************************
+server receive all data and begin compute at time: 330.285735 s 
+compute finish at time: 330.327735 s
+using time of this round: 25.409826 s
+*********************************
+server send to 4 node  *****  time: 330.285735 s 
+server send to 5 node  *****  time: 330.285735 s 
+server send to 6 node  *****  time: 330.285735 s 
+server send to 7 node  *****  time: 330.285735 s 
+server sending using time: 4.893205 s *** work receive time: 335.220940 s *** send time: 335.287940 s *** work node: 4 
+server sending using time: 10.062135 s *** work receive time: 340.389870 s *** send time: 340.416470 s *** work node: 5 
+server: receive date ******* at time:340.504940 s from node: 4
+server sending using time: 15.234875 s *** work receive time: 345.562610 s *** send time: 345.589210 s *** work node: 6 
+server: receive date ******* at time:345.677688 s from node: 5
+server sending using time: 20.407623 s *** work receive time: 350.735358 s *** send time: 350.777358 s *** work node: 7 
+server: receive date ******* at time:350.827386 s from node: 6
+server: receive date ******* at time:355.695561 s from node: 7
+*********************************
+server receive all data and begin compute at time: 355.695561 s 
+compute finish at time: 355.737561 s
+using time of this round: 25.409826 s
+*********************************
+server send to 4 node  *****  time: 355.695561 s 
+server send to 5 node  *****  time: 355.695561 s 
+server send to 6 node  *****  time: 355.695561 s 
+server send to 7 node  *****  time: 355.695561 s 
+server sending using time: 4.893205 s *** work receive time: 360.630766 s *** send time: 360.697766 s *** work node: 4 
+server sending using time: 10.062135 s *** work receive time: 365.799695 s *** send time: 365.826295 s *** work node: 5 
+server: receive date ******* at time:365.914765 s from node: 4
+server sending using time: 15.234875 s *** work receive time: 370.972435 s *** send time: 370.999035 s *** work node: 6 
+server: receive date ******* at time:371.087514 s from node: 5
+server sending using time: 20.407623 s *** work receive time: 376.145184 s *** send time: 376.187184 s *** work node: 7 
+server: receive date ******* at time:376.237212 s from node: 6
+server: receive date ******* at time:381.105386 s from node: 7
+*********************************
+server receive all data and begin compute at time: 381.105386 s 
+compute finish at time: 381.147386 s
+using time of this round: 25.409826 s
+*********************************
+server send to 4 node  *****  time: 381.105386 s 
+server send to 5 node  *****  time: 381.105386 s 
+server send to 6 node  *****  time: 381.105386 s 
+server send to 7 node  *****  time: 381.105386 s 
+server sending using time: 4.893205 s *** work receive time: 386.040591 s *** send time: 386.107591 s *** work node: 4 
+server sending using time: 10.062135 s *** work receive time: 391.209521 s *** send time: 391.236121 s *** work node: 5 
+server: receive date ******* at time:391.324591 s from node: 4
+server sending using time: 15.234875 s *** work receive time: 396.382261 s *** send time: 396.408861 s *** work node: 6 
+server: receive date ******* at time:396.497340 s from node: 5
+5675.75

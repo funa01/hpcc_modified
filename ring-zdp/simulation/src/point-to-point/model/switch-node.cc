@@ -116,6 +116,14 @@ void SwitchNode::SendToDev(Ptr<Packet>p, CustomHeader &ch){
 			qIndex = 0;
 		}else{
 			qIndex = (ch.l3Prot == 0x06 ? 1 : ch.udp.pg); // if TCP, put to queue 1
+			if(p->m_tag<m_devices[idx]->min_tag)
+			{
+				m_devices[idx]->min_tag = p->m_tag;
+			}
+			else if (p->m_tag > m_devices[idx]->min_tag)
+			{
+				qIndex = 1;
+			}
 		}
 
 		// admission control

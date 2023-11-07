@@ -22,7 +22,7 @@
 #define NODE_H
 
 #include <vector>
-
+#include <time.h>
 #include "ns3/object.h"
 #include "ns3/callback.h"
 #include "ns3/ptr.h"
@@ -57,11 +57,11 @@ class Node : public Object
 public:
   static TypeId GetTypeId (void);
   Ptr<Node> next_node;
-  uint32_t computetime;
-  int gpuAvai;
+  double computetime;
+  double gpuAvai;
   uint32_t m_pri;
   void setPri(uint32_t pri);
-  void setComT(uint32_t t); // set compute time(/s)
+  void setComT(double s); // set compute time(/s)
   Node();
   /**
    * \param systemId a unique integer used for parallel simulations.
